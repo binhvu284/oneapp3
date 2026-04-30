@@ -1,4 +1,4 @@
-# OneApp 2.6.8
+# OneApp 3
 
 OneApp is a modular super app acting as a workspace for users and developers. It includes authentication, data integrations (Lovable Cloud / Supabase), and modular sub-apps (Dashboard, Open Source, Workspace Data).
 
