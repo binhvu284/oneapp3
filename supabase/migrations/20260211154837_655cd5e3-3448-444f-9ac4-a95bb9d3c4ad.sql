@@ -1,0 +1,1 @@
+ALTER TABLE public.note_items ADD COLUMN parent_item_id uuid DEFAULT NULL;

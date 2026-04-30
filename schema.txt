@@ -1,0 +1,541 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.ai_agent_data (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  agent_id uuid NOT NULL,
+  data_type character varying NOT NULL,
+  data_content jsonb NOT NULL DEFAULT '{}'::jsonb,
+  tags ARRAY DEFAULT '{}'::text[],
+  importance_score numeric NOT NULL DEFAULT 0.5,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT ai_agent_data_pkey PRIMARY KEY (id),
+  CONSTRAINT ai_agent_data_agent_id_fkey FOREIGN KEY (agent_id) REFERENCES public.ai_agents(id)
+);
+CREATE TABLE public.ai_agent_memory (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  agent_id uuid NOT NULL,
+  content text NOT NULL,
+  context jsonb DEFAULT '{}'::jsonb,
+  importance_score numeric NOT NULL DEFAULT 0.5,
+  size_bytes bigint NOT NULL DEFAULT 0,
+  token_estimate integer NOT NULL DEFAULT 0,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT ai_agent_memory_pkey PRIMARY KEY (id),
+  CONSTRAINT ai_agent_memory_agent_id_fkey FOREIGN KEY (agent_id) REFERENCES public.ai_agents(id)
+);
+CREATE TABLE public.ai_agents (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  name character varying NOT NULL,
+  avatar_url text,
+  model character varying NOT NULL,
+  model_provider character varying,
+  api_key text,
+  description text,
+  is_default boolean NOT NULL DEFAULT false,
+  is_active boolean NOT NULL DEFAULT false,
+  memory_enabled boolean NOT NULL DEFAULT true,
+  memory_size_bytes bigint NOT NULL DEFAULT 0,
+  memory_token_estimate integer NOT NULL DEFAULT 0,
+  knowledge_files jsonb DEFAULT '[]'::jsonb,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT ai_agents_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.ai_conversations (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user_id uuid NOT NULL,
+  agent_id uuid,
+  title character varying NOT NULL DEFAULT 'New Conversation'::character varying,
+  pinned boolean NOT NULL DEFAULT false,
+  total_tokens integer NOT NULL DEFAULT 0,
+  message_count integer NOT NULL DEFAULT 0,
+  settings jsonb DEFAULT '{}'::jsonb,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  deleted_at timestamp with time zone,
+  CONSTRAINT ai_conversations_pkey PRIMARY KEY (id),
+  CONSTRAINT ai_conversations_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT ai_conversations_agent_id_fkey FOREIGN KEY (agent_id) REFERENCES public.ai_agents(id)
+);
+CREATE TABLE public.ai_interactions (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user_id uuid NOT NULL,
+  role character varying NOT NULL CHECK (role::text = ANY (ARRAY['user'::character varying, 'assistant'::character varying]::text[])),
+  content text NOT NULL,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT ai_interactions_pkey PRIMARY KEY (id),
+  CONSTRAINT ai_interactions_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.ai_message_files (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  message_id uuid NOT NULL,
+  file_id uuid,
+  file_name character varying NOT NULL,
+  file_type character varying,
+  file_size bigint DEFAULT 0,
+  file_url text,
+  processing_status character varying DEFAULT 'pending'::character varying,
+  extracted_text text,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT ai_message_files_pkey PRIMARY KEY (id),
+  CONSTRAINT ai_message_files_message_id_fkey FOREIGN KEY (message_id) REFERENCES public.ai_messages(id),
+  CONSTRAINT ai_message_files_file_id_fkey FOREIGN KEY (file_id) REFERENCES public.files(id)
+);
+CREATE TABLE public.ai_messages (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  conversation_id uuid NOT NULL,
+  role character varying NOT NULL CHECK (role::text = ANY (ARRAY['user'::character varying, 'assistant'::character varying, 'system'::character varying]::text[])),
+  content text NOT NULL,
+  token_count integer DEFAULT 0,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  deleted_at timestamp with time zone,
+  CONSTRAINT ai_messages_pkey PRIMARY KEY (id),
+  CONSTRAINT ai_messages_conversation_id_fkey FOREIGN KEY (conversation_id) REFERENCES public.ai_conversations(id)
+);
+CREATE TABLE public.analytics (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user_id uuid NOT NULL,
+  event_type character varying NOT NULL,
+  module_id uuid,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT analytics_pkey PRIMARY KEY (id),
+  CONSTRAINT analytics_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT analytics_module_id_fkey FOREIGN KEY (module_id) REFERENCES public.modules(id)
+);
+CREATE TABLE public.apis (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  name character varying NOT NULL,
+  type character varying NOT NULL,
+  api_url text NOT NULL,
+  api_key text NOT NULL,
+  status character varying NOT NULL DEFAULT 'unknown'::character varying CHECK (status::text = ANY (ARRAY['connected'::character varying, 'disconnected'::character varying, 'error'::character varying, 'unknown'::character varying]::text[])),
+  last_checked timestamp with time zone,
+  app_source character varying,
+  description text,
+  enabled boolean DEFAULT true,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT apis_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.app_categories (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  app_id uuid NOT NULL,
+  category_id uuid NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT app_categories_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.backup_versions (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  name character varying NOT NULL,
+  size bigint NOT NULL,
+  storage_url text,
+  description text,
+  is_current boolean DEFAULT false,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT backup_versions_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.categories (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  name text NOT NULL,
+  description text,
+  icon_name text DEFAULT 'Folder'::text,
+  icon_url text,
+  color text DEFAULT '#3b82f6'::text,
+  sort_order integer DEFAULT 0,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT categories_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.conversations (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid,
+  agent_id text NOT NULL,
+  agent_name text NOT NULL,
+  title text,
+  last_message text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT conversations_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.crypto_holdings (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  coin_symbol text NOT NULL,
+  coin_name text NOT NULL,
+  quantity numeric NOT NULL DEFAULT 0,
+  avg_buy_price numeric NOT NULL DEFAULT 0,
+  current_price numeric DEFAULT 0,
+  platform_id uuid,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT crypto_holdings_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.crypto_platforms (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  platform_name text NOT NULL,
+  api_key_encrypted text,
+  api_secret_encrypted text,
+  wallet_address text,
+  is_connected boolean NOT NULL DEFAULT false,
+  last_synced_at timestamp with time zone,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT crypto_platforms_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.crypto_transactions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  coin_symbol text NOT NULL,
+  transaction_type text NOT NULL,
+  quantity numeric NOT NULL,
+  price_per_unit numeric NOT NULL,
+  total_value numeric NOT NULL,
+  currency text NOT NULL DEFAULT 'USD'::text,
+  notes text,
+  platform_id uuid,
+  transaction_date timestamp with time zone NOT NULL DEFAULT now(),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT crypto_transactions_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.crypto_watchlist (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  coin_symbol text NOT NULL,
+  coin_name text NOT NULL,
+  alert_price_above numeric,
+  alert_price_below numeric,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT crypto_watchlist_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.external_connections (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  name text NOT NULL DEFAULT 'Supabase'::text,
+  supabase_url text,
+  is_active boolean DEFAULT false,
+  connection_status text DEFAULT 'not_setup'::text,
+  error_message text,
+  last_tested_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT external_connections_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.files (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user_id uuid NOT NULL,
+  name character varying NOT NULL,
+  path text NOT NULL,
+  size bigint NOT NULL,
+  mime_type character varying,
+  storage_url text,
+  category character varying,
+  tags ARRAY,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT files_pkey PRIMARY KEY (id),
+  CONSTRAINT files_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.in_use_apps (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  name text NOT NULL,
+  route text NOT NULL,
+  short_description text,
+  long_description text,
+  icon_url text,
+  app_image_url text,
+  status text NOT NULL DEFAULT 'developing'::text,
+  sort_order integer DEFAULT 0,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT in_use_apps_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.messages (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  conversation_id uuid NOT NULL,
+  role text NOT NULL,
+  content text NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT messages_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.module_config (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user_id uuid NOT NULL,
+  module_id uuid NOT NULL,
+  config jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT module_config_pkey PRIMARY KEY (id),
+  CONSTRAINT module_config_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT module_config_module_id_fkey FOREIGN KEY (module_id) REFERENCES public.modules(id)
+);
+CREATE TABLE public.modules (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  name character varying NOT NULL UNIQUE,
+  description text,
+  status character varying NOT NULL DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['active'::character varying, 'inactive'::character varying, 'pending'::character varying]::text[])),
+  icon character varying,
+  version character varying DEFAULT '1.0.0'::character varying,
+  dependencies ARRAY,
+  config jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT modules_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.note_folders (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  name text NOT NULL DEFAULT ''::text,
+  parent_id uuid,
+  icon_name text DEFAULT 'Folder'::text,
+  color text DEFAULT '#3b82f6'::text,
+  sort_order integer NOT NULL DEFAULT 0,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT note_folders_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.note_items (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  note_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  content text DEFAULT ''::text,
+  is_completed boolean NOT NULL DEFAULT false,
+  sort_order integer NOT NULL DEFAULT 0,
+  due_date timestamp with time zone,
+  priority text,
+  parent_item_id uuid,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT note_items_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.note_reminders (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  note_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  remind_at timestamp with time zone NOT NULL,
+  is_dismissed boolean NOT NULL DEFAULT false,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT note_reminders_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.note_shares (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  note_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  share_token text NOT NULL DEFAULT encode(gen_random_bytes(16), 'hex'::text),
+  is_active boolean NOT NULL DEFAULT true,
+  expires_at timestamp with time zone,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT note_shares_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.note_tag_links (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  note_id uuid NOT NULL,
+  tag_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  CONSTRAINT note_tag_links_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.note_tags (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  name text NOT NULL,
+  color text DEFAULT '#3b82f6'::text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT note_tags_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.note_templates (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid,
+  name text NOT NULL,
+  description text DEFAULT ''::text,
+  content text DEFAULT ''::text,
+  note_type text NOT NULL DEFAULT 'note'::text,
+  icon_name text DEFAULT 'FileText'::text,
+  is_system boolean NOT NULL DEFAULT false,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT note_templates_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.notes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  title text DEFAULT ''::text,
+  content text DEFAULT ''::text,
+  note_type text NOT NULL DEFAULT 'note'::text,
+  color text,
+  folder_id uuid,
+  is_pinned boolean NOT NULL DEFAULT false,
+  is_archived boolean NOT NULL DEFAULT false,
+  parent_id uuid,
+  sort_order integer NOT NULL DEFAULT 0,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT notes_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.oneapp_users (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  name character varying NOT NULL,
+  email character varying NOT NULL UNIQUE,
+  phone character varying,
+  user_data jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  password text,
+  password_hash text NOT NULL DEFAULT ''''::text,
+  display_name text,
+  nickname text,
+  avatar_url text,
+  bio text,
+  github_url text,
+  twitter_url text,
+  linkedin_url text,
+  website_url text,
+  level integer NOT NULL DEFAULT 4,
+  is_active boolean NOT NULL DEFAULT true,
+  email_verified boolean NOT NULL DEFAULT false,
+  must_change_password boolean NOT NULL DEFAULT false,
+  last_login_at timestamp with time zone,
+  lovable_user_id uuid,
+  CONSTRAINT oneapp_users_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.partner_keys (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  key_code text NOT NULL,
+  description text,
+  is_active boolean NOT NULL DEFAULT true,
+  max_uses integer DEFAULT 1,
+  current_uses integer NOT NULL DEFAULT 0,
+  expires_at timestamp with time zone,
+  created_by uuid,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT partner_keys_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.profiles (
+  id uuid NOT NULL,
+  display_name text,
+  nickname text,
+  phone text,
+  avatar_url text,
+  github_url text,
+  twitter_url text,
+  linkedin_url text,
+  website_url text,
+  bio text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT profiles_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.role_permissions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  role USER-DEFINED NOT NULL,
+  permission text NOT NULL,
+  description text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT role_permissions_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.system_connection (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  supabase_url text,
+  supabase_anon_key text,
+  supabase_service_key text,
+  is_active boolean DEFAULT false,
+  connection_status text DEFAULT 'not_setup'::text,
+  error_message text,
+  last_tested_at timestamp with time zone,
+  configured_by uuid,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT system_connection_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.tasks (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user_id uuid NOT NULL,
+  title character varying NOT NULL,
+  description text,
+  status character varying NOT NULL DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['pending'::character varying, 'in-progress'::character varying, 'completed'::character varying, 'cancelled'::character varying]::text[])),
+  priority character varying NOT NULL DEFAULT 'medium'::character varying CHECK (priority::text = ANY (ARRAY['low'::character varying, 'medium'::character varying, 'high'::character varying]::text[])),
+  due_date timestamp with time zone,
+  completed_at timestamp with time zone,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT tasks_pkey PRIMARY KEY (id),
+  CONSTRAINT tasks_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.user_api_keys (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  chatgpt_key text,
+  gemini_key text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  claude_key text,
+  perplexity_key text,
+  grok_key text,
+  deepseek_key text,
+  groq_key text,
+  exa_key text,
+  github_key text,
+  github_active_model text,
+  CONSTRAINT user_api_keys_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.user_roles (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  role USER-DEFINED NOT NULL,
+  assigned_by uuid,
+  assigned_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT user_roles_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.user_sessions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  token_hash text NOT NULL,
+  device_info text,
+  ip_address text,
+  expires_at timestamp with time zone NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  last_used_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT user_sessions_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.user_settings (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  theme text DEFAULT 'dark'::text,
+  custom_theme_colors jsonb,
+  sidebar_settings jsonb,
+  header_settings jsonb,
+  layout_settings jsonb,
+  display_settings jsonb,
+  dashboard_settings jsonb,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT user_settings_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.verified_emails (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  email text NOT NULL,
+  is_used boolean NOT NULL DEFAULT false,
+  used_at timestamp with time zone,
+  expires_at timestamp with time zone,
+  created_by uuid,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT verified_emails_pkey PRIMARY KEY (id)
+);
