@@ -1,11 +1,13 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { GripVertical } from "lucide-react";
 import { useBlockEditor } from "./useBlockEditor";
 import { BlockRenderer } from "./BlockRenderer";
 import { SlashCommandMenu } from "./SlashCommandMenu";
 import { FloatingToolbar } from "./FloatingToolbar";
-import { BlockType } from "./block-types";
+import { BlockType, extractPlainText } from "./block-types";
+import { InlineAIPanel } from "./InlineAIPanel";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { FF_INLINE_AI } from "@/lib/feature-flags";
 
 interface Props {
   content: string | null;
@@ -18,7 +20,54 @@ export function BlockEditor({ content, onSave }: Props) {
   const [slashMenu, setSlashMenu] = useState<{ blockId: string; pos: { top: number; left: number } } | null>(null);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [dropIdx, setDropIdx] = useState<number | null>(null);
+  const [inlineAI, setInlineAI] = useState<{
+    anchorId: string;
+    pos: { top: number; left: number };
+    context: { above: string[]; current: string; below: string[] };
+  } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!FF_INLINE_AI) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.key === "j" && (e.metaKey || e.ctrlKey))) return;
+      if (!containerRef.current) return;
+      const target = e.target as HTMLElement | null;
+      if (!target || !containerRef.current.contains(target)) return;
+      e.preventDefault();
+      const anchor = focusId ?? blocks[blocks.length - 1]?.id ?? null;
+      if (!anchor) return;
+      const idx = blocks.findIndex((b) => b.id === anchor);
+      if (idx < 0) return;
+      const above = blocks.slice(Math.max(0, idx - 3), idx).map((b) => extractPlainText({ blocks: [b] }));
+      const current = extractPlainText({ blocks: [blocks[idx]] });
+      const below = blocks.slice(idx + 1, idx + 4).map((b) => extractPlainText({ blocks: [b] }));
+      const rect = (target.closest("[data-block-row]") as HTMLElement | null)?.getBoundingClientRect()
+        ?? containerRef.current.getBoundingClientRect();
+      setInlineAI({
+        anchorId: anchor,
+        pos: { top: rect.bottom + 6, left: rect.left + 24 },
+        context: { above, current, below },
+      });
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [blocks, focusId]);
+
+  const handleInlineInsert = useCallback(
+    (text: string) => {
+      if (!inlineAI) return;
+      const parts = text.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+      if (parts.length === 0) return;
+      let prevId = inlineAI.anchorId;
+      for (const part of parts) {
+        prevId = addBlockAfter(prevId, "paragraph", { content: part });
+      }
+      setInlineAI(null);
+      setTimeout(() => setFocusId(prevId), 10);
+    },
+    [inlineAI, addBlockAfter]
+  );
 
   const handleEnter = useCallback((blockId: string) => {
     const newId = addBlockAfter(blockId);
@@ -61,6 +110,7 @@ export function BlockEditor({ content, onSave }: Props) {
           {blocks.map((block, idx) => (
             <div
               key={block.id}
+              data-block-row
               draggable
               onDragStart={() => handleDragStart(idx)}
               onDragOver={(e) => handleDragOver(e, idx)}
@@ -93,6 +143,14 @@ export function BlockEditor({ content, onSave }: Props) {
           position={slashMenu.pos}
           onSelect={handleSlashSelect}
           onClose={() => setSlashMenu(null)}
+        />
+      )}
+      {FF_INLINE_AI && inlineAI && (
+        <InlineAIPanel
+          position={inlineAI.pos}
+          context={inlineAI.context}
+          onInsert={handleInlineInsert}
+          onClose={() => setInlineAI(null)}
         />
       )}
     </div>
