@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { MessageSquare, Heart, Share2, Bookmark, TrendingUp, Clock, Users, Star, ArrowRight, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ParticleBackground } from "@/components/landing/ParticleBackground";
-import { SharedHeader } from "@/components/explore/SharedHeader";
 import { RevealSection } from "@/components/explore/RevealSection";
 import { useLanguage } from "@/hooks/useLanguage";
 
@@ -79,9 +78,6 @@ const Community = () => {
       {/* Gradient Orbs */}
       <div className="absolute top-1/4 -left-32 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl animate-pulse" />
       <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse delay-1000" />
-
-      {/* Header */}
-      <SharedHeader variant="floating" />
 
       {/* Hero Section */}
       <section className="relative z-10 py-20 md:py-28">

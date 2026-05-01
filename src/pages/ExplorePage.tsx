@@ -14,9 +14,14 @@ import { CoreValuesSection } from "@/components/explore/CoreValuesSection";
 import { EcosystemOrbitSection } from "@/components/explore/EcosystemOrbitSection";
 import { StatsSection } from "@/components/explore/StatsSection";
 import { FeaturesGridSection } from "@/components/explore/FeaturesGridSection";
+import { ScrollProgressRail } from "@/components/explore/ScrollProgressRail";
+import { DashboardMockup3D } from "@/components/explore/DashboardMockup3D";
 import { useAppStore, STORE_MODULES } from "@/hooks/useAppStore";
 import { Button } from "@/components/ui/button";
 import { AppIcon } from "@/components/icons/AppIcon";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useKonamiCode } from "@/hooks/useKonamiCode";
 
 export default function ExplorePage() {
   const navigate = useNavigate();
@@ -27,7 +32,39 @@ export default function ExplorePage() {
   const [contentVisible, setContentVisible] = useState(false);
   const [typedText, setTypedText] = useState("");
   const [showCursor, setShowCursor] = useState(true);
+  const [konamiBurst, setKonamiBurst] = useState(false);
+  const reduceMotion = useReducedMotion();
   const fullText = "Explore the magic of technology";
+
+  useDocumentMeta({
+    title: "OneApp — One System, Infinite Control",
+    description:
+      "OneApp is the founder's operating system: notes, tasks, AI, crypto, deploys — all in one personal workspace.",
+    canonicalPath: "/explore",
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          name: "OneApp",
+          url: typeof window !== "undefined" ? window.location.origin : "https://oneapp.app",
+        },
+        {
+          "@type": "WebSite",
+          name: "OneApp",
+          url: typeof window !== "undefined" ? window.location.origin : "https://oneapp.app",
+        },
+      ],
+    },
+  });
+
+  useKonamiCode(() => {
+    if (reduceMotion) return;
+    setKonamiBurst(true);
+    // eslint-disable-next-line no-console
+    console.log("%c⌁ founder mode unlocked ⌁", "color:#00F0FF;font-weight:700;");
+    setTimeout(() => setKonamiBurst(false), 2400);
+  });
 
   const startTyping = useCallback(() => {
     let currentIndex = 0;
@@ -80,19 +117,19 @@ export default function ExplorePage() {
       title: "The Ecosystem",
       description: "Core technologies and spin-offs that power your experience.",
       icon: Zap,
-      href: "/features",
+      href: "/ecosystem",
     },
     {
       title: "The Journey",
       description: "From idea to reality – our story and vision for the future.",
       icon: Map,
-      href: "/about",
+      href: "/journey",
     },
     {
       title: "Intel Forum",
       description: "Exclusive access to insights, updates, and community discussions.",
       icon: Users,
-      href: "/community",
+      href: "/forum",
     },
   ];
 
@@ -146,6 +183,40 @@ export default function ExplorePage() {
       {/* Fixed Header - Always on top, separate from scrollable content */}
       <SharedHeader variant="floating" visible={headerVisible} />
 
+      {/* Scroll storytelling rail (desktop only, motion users only) */}
+      {!showPreloader && <ScrollProgressRail />}
+
+      {/* Konami easter egg overlay */}
+      {konamiBurst && (
+        <div
+          aria-hidden
+          className="pointer-events-none fixed inset-0 z-40 animate-[konami-flash_2.4s_ease-out_forwards]"
+          style={{
+            background:
+              "radial-gradient(circle at center, rgba(0,240,255,0.18) 0%, transparent 60%)",
+          }}
+        />
+      )}
+      <style>{`
+        @keyframes konami-flash {
+          0%   { opacity: 0; }
+          15%  { opacity: 1; }
+          100% { opacity: 0; }
+        }
+        @keyframes hero-word-in {
+          from { opacity: 0; transform: translateY(20px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .hero-word {
+          display: inline-block;
+          opacity: 0;
+          animation: hero-word-in 0.6s cubic-bezier(0.16,1,0.3,1) forwards;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-word { animation: none; opacity: 1; }
+        }
+      `}</style>
+
       {/* Main Content */}
       <div
         className={`transition-all duration-700 ${contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
@@ -161,11 +232,29 @@ export default function ExplorePage() {
               Welcome to OneApp 2.0
             </Badge>
 
-            {/* Main Headline */}
+            {/* Main Headline — word-by-word staggered entrance */}
             <h1 className="text-4xl sm:text-6xl md:text-8xl font-bold tracking-tight leading-[1.05]">
-              <span className="block">ONE SYSTEM</span>
+              <span className="block">
+                {"ONE SYSTEM".split(" ").map((word, i) => (
+                  <span
+                    key={`${word}-${i}`}
+                    className="hero-word mr-3"
+                    style={{ animationDelay: `${i * 80}ms` }}
+                  >
+                    {word}
+                  </span>
+                ))}
+              </span>
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-600">
-                INFINITE CONTROL
+                {"INFINITE CONTROL".split(" ").map((word, i) => (
+                  <span
+                    key={`${word}-${i}`}
+                    className="hero-word mr-3"
+                    style={{ animationDelay: `${(i + 2) * 80}ms` }}
+                  >
+                    {word}
+                  </span>
+                ))}
               </span>
             </h1>
 
@@ -194,6 +283,13 @@ export default function ExplorePage() {
             </div>
           </div>
         </section>
+
+        {/* 3D Dashboard Mockup */}
+        {!showPreloader && (
+          <section className="relative px-4 sm:px-6 pb-16 sm:pb-24">
+            <DashboardMockup3D />
+          </section>
+        )}
 
         {/* Section 2: Core Values Constellation - Only mount after preloader */}
         {!showPreloader && <CoreValuesSection key={location.key} />}

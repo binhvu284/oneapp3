@@ -8,6 +8,9 @@ OneApp is a modular super app acting as a workspace for users and developers. It
 
 - [docs/ONEAPP_3_PRD.md](./docs/ONEAPP_3_PRD.md) - Product Requirements Document for OneApp 3.
 - [docs/PHASE_1_IMPLEMENTATION_PLAN.md](./docs/PHASE_1_IMPLEMENTATION_PLAN.md) - Engineering plan for Phase 1 (OneNote 3.0).
+- [docs/PHASE_1_PROGRESS.md](./docs/PHASE_1_PROGRESS.md) - Phase 1 progress tracker.
+- [docs/PHASE_5_IMPLEMENTATION_PLAN.md](./docs/PHASE_5_IMPLEMENTATION_PLAN.md) - Engineering plan for Phase 5 (Website 3.0).
+- [docs/PHASE_5_PROGRESS.md](./docs/PHASE_5_PROGRESS.md) - Phase 5 progress tracker.
 
 ### Old versions (OneApp 1 & 2)
 
@@ -41,6 +44,18 @@ npm run test
 - **Supabase Authentication**: Integrated Auth and DB.
 - **Dynamic Dashboard**: Grid-based modular dashboard with draggable widgets.
 - **Integrated Apps**: Categorize and manage your connected apps.
+
+## Public website routes
+
+| Route        | Description                                                       |
+| ------------ | ----------------------------------------------------------------- |
+| `/explore`   | Cinematic landing — hero, 3D dashboard mock, scroll storytelling. |
+| `/ecosystem` | Five OneApp 3 modules with status badges and hover previews.      |
+| `/journey`   | Scroll-driven timeline of OneApp v1 → v2 → v3.                    |
+| `/forum`     | Community hub.                                                    |
+| `/docs`      | Searchable documentation with category sidebar.                   |
+| `/pricing`   | Free / Pro / Enterprise tiers (Pro & Enterprise coming soon).     |
+| `/changelog` | Version history with Added / Changed / Fixed sections.            |
 
 ## Scripts
 
