@@ -4,6 +4,7 @@ import { Zap, Map, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useAuthSource } from "@/hooks/useAuthSource";
 import { CounterPreloader } from "@/components/explore/CounterPreloader";
+import { CinematicIntro } from "@/components/explore/CinematicIntro";
 import { SharedHeader } from "@/components/explore/SharedHeader";
 import { GradientBlobs } from "@/components/explore/GradientBlobs";
 import { NavigationCard } from "@/components/explore/NavigationCard";
@@ -16,6 +17,9 @@ import { StatsSection } from "@/components/explore/StatsSection";
 import { FeaturesGridSection } from "@/components/explore/FeaturesGridSection";
 import { ScrollProgressRail } from "@/components/explore/ScrollProgressRail";
 import { DashboardMockup3D } from "@/components/explore/DashboardMockup3D";
+import { ComparisonSection } from "@/components/explore/ComparisonSection";
+import { FeatureDemoSection } from "@/components/explore/FeatureDemoSection";
+import { EverythingConnectedSection } from "@/components/explore/EverythingConnectedSection";
 import { useAppStore, STORE_MODULES } from "@/hooks/useAppStore";
 import { Button } from "@/components/ui/button";
 import { AppIcon } from "@/components/icons/AppIcon";
@@ -27,6 +31,14 @@ export default function ExplorePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuthSource();
+
+  // Show CinematicIntro on first session visit; show CounterPreloader on return visits
+  const [introDone] = useState(
+    () => typeof sessionStorage !== "undefined"
+      ? sessionStorage.getItem("oneapp-v3-intro-seen") === "1"
+      : true
+  );
+  // Always start true — either CinematicIntro or CounterPreloader acts as the gating preloader
   const [showPreloader, setShowPreloader] = useState(true);
   const [headerVisible, setHeaderVisible] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
@@ -87,16 +99,15 @@ export default function ExplorePage() {
   }, []);
 
   useEffect(() => {
-    if (showPreloader) {
+    if (showPreloader || !introDone) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
     }
-    // Cleanup on unmount
     return () => {
       document.body.style.overflow = "";
     };
-  }, [showPreloader]);
+  }, [showPreloader, introDone]);
 
   const { installedApps, toggleApp } = useAppStore();
 
@@ -173,12 +184,17 @@ export default function ExplorePage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden relative">
+    <div className="min-h-screen bg-[#050814] text-white overflow-x-hidden relative">
       {/* Star Background */}
       <ParticleBackground />
 
-      {/* Preloader */}
-      {showPreloader && <CounterPreloader onComplete={handlePreloaderComplete} />}
+      {/* Cinematic intro — first session visit only */}
+      {!introDone && (
+        <CinematicIntro onComplete={handlePreloaderComplete} />
+      )}
+
+      {/* Counter preloader — return visits */}
+      {introDone && showPreloader && <CounterPreloader onComplete={handlePreloaderComplete} />}
 
       {/* Fixed Header - Always on top, separate from scrollable content */}
       <SharedHeader variant="floating" visible={headerVisible} />
@@ -224,17 +240,21 @@ export default function ExplorePage() {
       >
         {/* Hero Section — use svh for mobile browser chrome support */}
         <section className="relative min-h-[100svh] flex items-center justify-center overflow-hidden">
+          {/* Cyberpunk grid overlay */}
+          <div className="absolute inset-0 bg-cyber-grid opacity-100 pointer-events-none" />
+          {/* Radial vignette to fade grid at edges */}
+          <div className="absolute inset-0 bg-radial-vignette pointer-events-none" style={{ background: "radial-gradient(ellipse 80% 80% at 50% 50%, transparent 40%, #050814 100%)" }} />
           <GradientBlobs />
 
           <div className="relative z-10 text-center px-5 sm:px-8 w-full max-w-4xl mx-auto">
             {/* Badge */}
-            <Badge className="mb-5 sm:mb-6 bg-white/10 text-white/80 border-white/20 backdrop-blur-sm px-3 sm:px-4 py-1 sm:py-1.5 text-[10px] sm:text-xs uppercase tracking-[0.2em] font-medium">
-              Welcome to OneApp 2.0
+            <Badge className="mb-5 sm:mb-6 bg-indigo-500/10 text-indigo-300 border-indigo-500/30 backdrop-blur-sm px-3 sm:px-4 py-1 sm:py-1.5 text-[10px] sm:text-xs uppercase tracking-[0.2em] font-medium shadow-[0_0_12px_rgba(99,102,241,0.2)]">
+              Welcome to OneApp 3.0
             </Badge>
 
             {/* Main Headline — word-by-word staggered entrance */}
             <h1 className="text-4xl sm:text-6xl md:text-8xl font-bold tracking-tight leading-[1.05]">
-              <span className="block">
+              <span className="block text-glow-brand">
                 {"ONE SYSTEM".split(" ").map((word, i) => (
                   <span
                     key={`${word}-${i}`}
@@ -245,7 +265,7 @@ export default function ExplorePage() {
                   </span>
                 ))}
               </span>
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-600">
+              <span className="block text-gradient-brand">
                 {"INFINITE CONTROL".split(" ").map((word, i) => (
                   <span
                     key={`${word}-${i}`}
@@ -262,7 +282,7 @@ export default function ExplorePage() {
             <p className="mt-4 sm:mt-6 text-gray-400 text-sm sm:text-base md:text-lg font-light tracking-wide h-6 sm:h-7">
               {typedText}
               {showCursor && (
-                <span className="inline-block w-[2px] h-4 sm:h-5 bg-cyan-400 ml-1 animate-pulse" />
+                <span className="inline-block w-[2px] h-4 sm:h-5 bg-indigo-400 ml-1 animate-pulse" />
               )}
             </p>
 
@@ -276,9 +296,9 @@ export default function ExplorePage() {
           <div className="hidden sm:flex absolute bottom-10 left-1/2 -translate-x-1/2 flex-col items-center gap-1.5">
             <span className="text-white/25 text-[10px] tracking-[0.3em] uppercase">scroll</span>
             <div className="flex flex-col items-center gap-1 animate-bounce">
-              <div className="w-px h-8 bg-gradient-to-b from-cyan-500/60 to-transparent" />
+              <div className="w-px h-8 bg-gradient-to-b from-indigo-500/60 to-transparent" />
               <svg width="12" height="7" viewBox="0 0 12 7" fill="none">
-                <path d="M1 1L6 6L11 1" stroke="rgba(0,240,255,0.5)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M1 1L6 6L11 1" stroke="rgba(99,102,241,0.6)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
           </div>
@@ -294,13 +314,22 @@ export default function ExplorePage() {
         {/* Section 2: Core Values Constellation - Only mount after preloader */}
         {!showPreloader && <CoreValuesSection key={location.key} />}
 
-        {/* Section 3: Ecosystem Orbit */}
+        {/* Section 3: v2 vs v3 Comparison */}
+        {!showPreloader && <ComparisonSection />}
+
+        {/* Section 4: Interactive Feature Demos */}
+        {!showPreloader && <FeatureDemoSection />}
+
+        {/* Section 5: Everything Connected — showstopper orbit */}
+        {!showPreloader && <EverythingConnectedSection />}
+
+        {/* Section 6: Ecosystem Orbit */}
         {!showPreloader && <EcosystemOrbitSection />}
 
-        {/* Section 4: Stats */}
+        {/* Section 7: Stats */}
         {!showPreloader && <StatsSection />}
 
-        {/* Section 5: Features Grid */}
+        {/* Section 8: Features Grid */}
         {!showPreloader && <FeaturesGridSection />}
 
         {/* Navigation Cards Section */}

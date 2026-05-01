@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -136,7 +136,7 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
   }
 }
 
@@ -217,10 +217,15 @@
 
   /* Subtle pulse for streaming text */
   @keyframes pulse-subtle {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.85; }
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.85;
+    }
   }
-  
+
   .animate-pulse-subtle {
     animation: pulse-subtle 1.5s ease-in-out infinite;
   }
@@ -271,12 +276,99 @@
   }
 
   @keyframes glow-pulse {
-    0%, 100% {
+    0%,
+    100% {
       box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
     }
     50% {
       box-shadow: 0 0 40px rgba(6, 182, 212, 0.5);
     }
+  }
+
+  /* ── v3.0 Brand utilities (public site) ─────────────────────────────── */
+
+  .text-gradient-brand {
+    background: linear-gradient(135deg, #818cf8 0%, #60a5fa 50%, #38bdf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-glow-brand {
+    text-shadow:
+      0 0 24px rgba(99, 102, 241, 0.55),
+      0 0 64px rgba(99, 102, 241, 0.2);
+  }
+
+  .border-glow-indigo {
+    box-shadow:
+      0 0 0 1px rgba(99, 102, 241, 0.35),
+      0 0 24px rgba(99, 102, 241, 0.15);
+  }
+
+  .bg-cyber-grid {
+    background-image:
+      linear-gradient(rgba(99, 102, 241, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(99, 102, 241, 0.06) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+
+  @keyframes glow-pulse-indigo {
+    0%,
+    100% {
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 50px rgba(99, 102, 241, 0.55);
+    }
+  }
+
+  @keyframes scanline {
+    0% {
+      transform: translateY(-100%);
+    }
+    100% {
+      transform: translateY(100vh);
+    }
+  }
+
+  @keyframes flicker-in {
+    0% {
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.9;
+    }
+    20% {
+      opacity: 0.4;
+    }
+    30% {
+      opacity: 1;
+    }
+    40% {
+      opacity: 0.7;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes count-up {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-flicker-in {
+    animation: flicker-in 0.6s ease-out forwards;
   }
 
   .animate-fade-up {
@@ -305,7 +397,8 @@
 
   /* Core Values Constellation Animations */
   @keyframes float-gentle {
-    0%, 100% {
+    0%,
+    100% {
       transform: translateY(0);
     }
     50% {
@@ -314,7 +407,8 @@
   }
 
   @keyframes hub-breathe {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 0.15;
       transform: scale(1);
     }
@@ -325,7 +419,8 @@
   }
 
   @keyframes glow-soft {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 0.3;
       filter: blur(8px);
     }
@@ -447,7 +542,7 @@
   }
 
   .animate-neon-draw-drop-center {
-    animation: neon-draw-drop-center 0.4s ease-out 1.0s forwards;
+    animation: neon-draw-drop-center 0.4s ease-out 1s forwards;
     opacity: 0;
   }
 
@@ -472,14 +567,30 @@
   }
 
   /* Stagger delays */
-  .delay-100 { animation-delay: 100ms; }
-  .delay-200 { animation-delay: 200ms; }
-  .delay-300 { animation-delay: 300ms; }
-  .delay-400 { animation-delay: 400ms; }
-  .delay-500 { animation-delay: 500ms; }
-  .delay-600 { animation-delay: 600ms; }
-  .delay-700 { animation-delay: 700ms; }
-  .delay-800 { animation-delay: 800ms; }
+  .delay-100 {
+    animation-delay: 100ms;
+  }
+  .delay-200 {
+    animation-delay: 200ms;
+  }
+  .delay-300 {
+    animation-delay: 300ms;
+  }
+  .delay-400 {
+    animation-delay: 400ms;
+  }
+  .delay-500 {
+    animation-delay: 500ms;
+  }
+  .delay-600 {
+    animation-delay: 600ms;
+  }
+  .delay-700 {
+    animation-delay: 700ms;
+  }
+  .delay-800 {
+    animation-delay: 800ms;
+  }
 
   /* Enhanced hover effects */
   .hover-lift {
@@ -509,7 +620,7 @@
     @apply relative transition-all duration-300;
   }
   .nav-link-landing::after {
-    content: '';
+    content: "";
     @apply absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 transform scale-x-0 transition-transform duration-300 origin-left;
   }
   .nav-link-landing:hover::after {

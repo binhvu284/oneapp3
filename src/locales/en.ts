@@ -13,7 +13,7 @@ export const en: Record<string, string> = {
     "nav.backToHome": "Back to Explore",
 
     // Landing Page
-    "landing.badge": "Welcome to OneApp 2.0",
+    "landing.badge": "Welcome to OneApp 3.0",
     "landing.title1": "One Platform,",
     "landing.title2": "Infinite Possibilities",
     "landing.subtitle": "The next-generation all-in-one platform that seamlessly integrates AI, cloud services, and a powerful ecosystem to transform your digital experience.",
@@ -116,8 +116,10 @@ export const en: Record<string, string> = {
     "about.timeline.2023.desc": "First version with basic features, received positive feedback from the community.",
     "about.timeline.2024.title": "Ecosystem Development",
     "about.timeline.2024.desc": "Expanded with OneMess, OneNews, OneApp Cloud, and Vennor Design System.",
-    "about.timeline.2025.title": "OneApp 2.0 - Present",
-    "about.timeline.2025.desc": "Completely new version with integrated AI, superior performance, and modern UX.",
+    "about.timeline.2025.title": "OneApp 2.0",
+    "about.timeline.2025.desc": "Rebuilt from scratch: custom auth, modular dashboard, OneAI, OneCrypto, and the public ecosystem landing.",
+    "about.timeline.2026.title": "OneApp 3.0 — Present",
+    "about.timeline.2026.desc": "The complete ecosystem: founder-mode notes, AI-native workspace, neumorphic interface, and the full Founder's OS.",
     "about.values.title": "Core Values",
     "about.values.subtitle": "Principles that guide all our activities",
     "about.values.passion": "Passion for Technology",

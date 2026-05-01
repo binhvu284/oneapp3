@@ -13,7 +13,7 @@ export const vi: Record<string, string> = {
     "nav.backToHome": "Về Khám Phá",
 
     // Landing Page
-    "landing.badge": "Chào mừng đến OneApp 2.0",
+    "landing.badge": "Chào mừng đến OneApp 3.0",
     "landing.title1": "Một Nền tảng,",
     "landing.title2": "Vô hạn Khả năng",
     "landing.subtitle": "Nền tảng tích hợp thế hệ mới kết hợp AI, dịch vụ đám mây và hệ sinh thái mạnh mẽ để chuyển đổi trải nghiệm số của bạn.",
@@ -116,8 +116,10 @@ export const vi: Record<string, string> = {
     "about.timeline.2023.desc": "Phiên bản đầu tiên với các tính năng cơ bản, nhận được phản hồi tích cực từ cộng đồng.",
     "about.timeline.2024.title": "Phát triển Hệ sinh thái",
     "about.timeline.2024.desc": "Mở rộng với OneMess, OneNews, OneApp Cloud và Vennor Design System.",
-    "about.timeline.2025.title": "OneApp 2.0 - Hiện tại",
-    "about.timeline.2025.desc": "Phiên bản hoàn toàn mới với AI tích hợp, hiệu suất vượt trội và UX hiện đại.",
+    "about.timeline.2025.title": "OneApp 2.0",
+    "about.timeline.2025.desc": "Xây dựng lại từ đầu: auth tùy chỉnh, dashboard module, OneAI, OneCrypto và landing ecosystem.",
+    "about.timeline.2026.title": "OneApp 3.0 — Hiện tại",
+    "about.timeline.2026.desc": "Hệ sinh thái hoàn chỉnh: ghi chú founder-mode, workspace AI-native, giao diện neumorphic và Founder's OS đầy đủ.",
     "about.values.title": "Giá trị Cốt lõi",
     "about.values.subtitle": "Những nguyên tắc định hướng mọi hoạt động của chúng tôi",
     "about.values.passion": "Đam mê Công nghệ",
