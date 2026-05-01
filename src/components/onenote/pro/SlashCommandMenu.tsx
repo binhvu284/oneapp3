@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef, KeyboardEvent } from "react";
+import { useState, useEffect, useRef, KeyboardEvent, useMemo } from "react";
 import { BLOCK_MENU_ITEMS, BlockType } from "./block-types";
+import { FF_FOUNDER_BLOCKS } from "@/lib/feature-flags";
 
 interface Props {
   position: { top: number; left: number };
@@ -13,7 +14,12 @@ export function SlashCommandMenu({ position, onSelect, onClose }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const filtered = BLOCK_MENU_ITEMS.filter(item =>
+  const visible = useMemo(
+    () => BLOCK_MENU_ITEMS.filter(item => FF_FOUNDER_BLOCKS || !item.founder),
+    []
+  );
+
+  const filtered = visible.filter(item =>
     item.label.toLowerCase().includes(filter.toLowerCase()) ||
     item.description.toLowerCase().includes(filter.toLowerCase())
   );

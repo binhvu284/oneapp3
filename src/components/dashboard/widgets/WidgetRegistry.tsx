@@ -1,7 +1,7 @@
 import { lazy, ComponentType } from "react";
 import {
   Clock, BarChart3, Grid3X3, Activity, TrendingUp,
-  Calendar, Hand, Zap, StickyNote, CloudSun, Timer, CheckSquare,
+  Calendar, Hand, Zap, StickyNote, CloudSun, Timer, CheckSquare, Sunrise,
 } from "lucide-react";
 
 const ClockWidget = lazy(() => import("./ClockWidget"));
@@ -16,6 +16,7 @@ const NotesWidget = lazy(() => import("./NotesWidget"));
 const WeatherWidget = lazy(() => import("./WeatherWidget"));
 const PomodoroWidget = lazy(() => import("./PomodoroWidget"));
 const TodoWidget = lazy(() => import("./TodoWidget"));
+const DailyBriefingWidget = lazy(() => import("./DailyBriefingWidget"));
 
 export type WidgetType =
   | "clock"
@@ -29,7 +30,8 @@ export type WidgetType =
   | "notes"
   | "weather"
   | "pomodoro"
-  | "todo";
+  | "todo"
+  | "daily_briefing";
 
 export interface WidgetDefinition {
   type: WidgetType;
@@ -160,6 +162,14 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
     icon: Calendar,
     component: CalendarWidget,
     defaultSize: { w: 3, h: 3, minW: 3, minH: 3 },
+  },
+  daily_briefing: {
+    type: "daily_briefing",
+    label: "Daily Briefing",
+    description: "Today's tasks, decisions, ideas, mood",
+    icon: Sunrise,
+    component: DailyBriefingWidget,
+    defaultSize: { w: 4, h: 4, minW: 3, minH: 3 },
   },
 };
 

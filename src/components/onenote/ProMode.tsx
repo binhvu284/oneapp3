@@ -16,9 +16,14 @@ import { NoteActionsMenu } from "./pro/NoteActionsMenu";
 import { TagBadge } from "./TagBadge";
 import { TagManager } from "./TagManager";
 import { NoteColorPicker } from "./NoteColorPicker";
+import { BacklinksPanel } from "./BacklinksPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { format } from "date-fns";
+import { parseContent } from "./pro/block-types";
+import { extractLinkTitlesFromContent } from "@/lib/blocks/extract-links";
+import { syncNoteLinks } from "@/hooks/useNoteLinks";
+import { FF_NOTE_LINKS, FF_NOTE_AGING } from "@/lib/feature-flags";
 
 export function ProMode() {
   const { notes, isLoading, createNote, updateNote, deleteNote, togglePin, toggleArchive, refetch } = useNotes();
@@ -141,6 +146,24 @@ export function ProMode() {
     if (!selectedNote) return;
     setSaveStatus("saving");
     await updateNote(selectedNote.id, { content });
+    if (FF_NOTE_LINKS) {
+      try {
+        const titles = extractLinkTitlesFromContent(parseContent(content));
+        if (titles.length > 0) {
+          const { data } = await supabase
+            .from("notes")
+            .select("id, title")
+            .eq("user_id", selectedNote.user_id)
+            .in("title", titles);
+          const ids = (data ?? []).map((r: { id: string }) => r.id);
+          await syncNoteLinks(selectedNote.id, ids);
+        } else {
+          await syncNoteLinks(selectedNote.id, []);
+        }
+      } catch (e) {
+        console.error("syncNoteLinks failed", e);
+      }
+    }
     setSaveStatus("saved");
     setTimeout(() => setSaveStatus("idle"), 1500);
   }, [selectedNote, updateNote]);
@@ -281,6 +304,14 @@ export function ProMode() {
                     <div className="flex items-center gap-1.5">
                       {note.note_type === "todo" ? <CheckSquare className="w-3 h-3 text-muted-foreground shrink-0" /> : <FileText className="w-3 h-3 text-muted-foreground shrink-0" />}
                       <span className="text-xs font-medium truncate flex-1">{note.title || "Untitled"}</span>
+                      {FF_NOTE_AGING && (Date.now() - new Date(note.updated_at).getTime() > 30 * 86400000) && (
+                        <span
+                          className="text-[9px] px-1 py-0 rounded bg-amber-500/15 text-amber-400 border border-amber-500/20 shrink-0"
+                          title="Note hasn't changed in 30+ days"
+                        >
+                          Revisit?
+                        </span>
+                      )}
                       {note.is_pinned && <Pin className="w-2.5 h-2.5 text-primary shrink-0" />}
                       <NoteActionsMenu
                         note={note}
@@ -308,6 +339,17 @@ export function ProMode() {
             )}
           </div>
         </ScrollArea>
+        {FF_NOTE_LINKS && (
+          <div className="border-t border-border px-1 py-1.5 shrink-0">
+            <BacklinksPanel
+              noteId={selectedNote?.id ?? null}
+              onSelect={(id) => {
+                const n = notes.find(x => x.id === id);
+                if (n) setSelectedNote(n);
+              }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

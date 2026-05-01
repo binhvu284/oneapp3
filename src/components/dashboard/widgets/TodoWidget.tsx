@@ -1,10 +1,13 @@
-import { useState, useEffect, useRef } from "react";
-import { Plus, X, Check } from "lucide-react";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { Plus, X, Check, Battery, Zap } from "lucide-react";
+import { useTodayMood, EnergyLevel } from "@/hooks/useTodayMood";
+import { FF_MOOD_ROUTING } from "@/lib/feature-flags";
 
 interface TodoItem {
   id: string;
   text: string;
   done: boolean;
+  energy?: EnergyLevel;
 }
 
 interface TodoWidgetProps {
@@ -46,6 +49,28 @@ export default function TodoWidget({ config, onConfigChange }: TodoWidgetProps) 
   };
 
   const remaining = todos.filter((t) => !t.done).length;
+  const { data: mood } = useTodayMood();
+  const moodLevel = FF_MOOD_ROUTING ? mood?.level ?? null : null;
+
+  const orderedTodos = useMemo(() => {
+    if (!moodLevel) return todos;
+    const score = (t: TodoItem) => {
+      if (t.energy === moodLevel) return 0;
+      if (!t.energy) return 1;
+      return 2;
+    };
+    return [...todos].sort((a, b) => score(a) - score(b));
+  }, [todos, moodLevel]);
+
+  const cycleEnergy = (id: string) => {
+    save(
+      todos.map((t) => {
+        if (t.id !== id) return t;
+        const next: EnergyLevel = !t.energy ? "low" : t.energy === "low" ? "deep" : null;
+        return { ...t, energy: next };
+      })
+    );
+  };
 
   return (
     <div className="flex flex-col h-full gap-2">
@@ -71,36 +96,62 @@ export default function TodoWidget({ config, onConfigChange }: TodoWidgetProps) 
         {todos.length === 0 && (
           <p className="text-[10px] text-muted-foreground/50 text-center mt-4">No tasks yet</p>
         )}
-        {todos.map((todo) => (
-          <div
-            key={todo.id}
-            className="flex items-center gap-1.5 group px-1 py-1 rounded-md hover:bg-muted/30 transition-colors"
-          >
-            <button
-              onClick={() => toggleTodo(todo.id)}
-              className={`w-4 h-4 shrink-0 rounded border flex items-center justify-center transition-colors ${
-                todo.done
-                  ? "bg-primary/20 border-primary/40 text-primary"
-                  : "border-border hover:border-primary/40"
+        {orderedTodos.map((todo) => {
+          const matchesMood = moodLevel && todo.energy === moodLevel;
+          return (
+            <div
+              key={todo.id}
+              className={`flex items-center gap-1.5 group px-1 py-1 rounded-md transition-colors ${
+                matchesMood ? "bg-primary/5 ring-1 ring-primary/20" : "hover:bg-muted/30"
               }`}
             >
-              {todo.done && <Check className="w-2.5 h-2.5" />}
-            </button>
-            <span
-              className={`text-xs flex-1 truncate ${
-                todo.done ? "line-through text-muted-foreground/50" : "text-foreground"
-              }`}
-            >
-              {todo.text}
-            </span>
-            <button
-              onClick={() => removeTodo(todo.id)}
-              className="opacity-0 group-hover:opacity-100 p-0.5 text-muted-foreground hover:text-destructive transition-all"
-            >
-              <X className="w-3 h-3" />
-            </button>
-          </div>
-        ))}
+              <button
+                onClick={() => toggleTodo(todo.id)}
+                className={`w-4 h-4 shrink-0 rounded border flex items-center justify-center transition-colors ${
+                  todo.done
+                    ? "bg-primary/20 border-primary/40 text-primary"
+                    : "border-border hover:border-primary/40"
+                }`}
+              >
+                {todo.done && <Check className="w-2.5 h-2.5" />}
+              </button>
+              <span
+                className={`text-xs flex-1 truncate ${
+                  todo.done ? "line-through text-muted-foreground/50" : "text-foreground"
+                }`}
+              >
+                {todo.text}
+              </span>
+              {FF_MOOD_ROUTING && (
+                <button
+                  onClick={() => cycleEnergy(todo.id)}
+                  className={`opacity-60 group-hover:opacity-100 p-0.5 transition-all ${
+                    todo.energy === "low"
+                      ? "text-emerald-400"
+                      : todo.energy === "deep"
+                      ? "text-violet-400"
+                      : "text-muted-foreground"
+                  }`}
+                  title={
+                    todo.energy === "low"
+                      ? "Low-energy task"
+                      : todo.energy === "deep"
+                      ? "Deep-work task"
+                      : "Tap to tag energy"
+                  }
+                >
+                  {todo.energy === "deep" ? <Zap className="w-3 h-3" /> : <Battery className="w-3 h-3" />}
+                </button>
+              )}
+              <button
+                onClick={() => removeTodo(todo.id)}
+                className="opacity-0 group-hover:opacity-100 p-0.5 text-muted-foreground hover:text-destructive transition-all"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          );
+        })}
       </div>
 
       {/* Footer */}

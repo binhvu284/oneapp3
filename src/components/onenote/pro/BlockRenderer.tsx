@@ -6,6 +6,10 @@ import { ChecklistBlock } from "./blocks/ChecklistBlock";
 import { QuoteBlock } from "./blocks/QuoteBlock";
 import { CodeBlock } from "./blocks/CodeBlock";
 import { DividerBlock } from "./blocks/DividerBlock";
+import { IdeaBlock } from "./blocks/IdeaBlock";
+import { DecisionLogBlock } from "./blocks/DecisionLogBlock";
+import { MoodEnergyBlock } from "./blocks/MoodEnergyBlock";
+import { SprintBlock } from "./blocks/SprintBlock";
 
 interface Props {
   block: Block;
@@ -34,6 +38,14 @@ export function BlockRenderer({ block, index, onUpdate, onEnter, onDelete, onSla
       return <CodeBlock block={block} onUpdate={onUpdate} onEnter={onEnter} onDelete={onDelete} focusId={focusId} />;
     case "divider":
       return <DividerBlock />;
+    case "idea":
+      return <IdeaBlock block={block} onUpdate={onUpdate} />;
+    case "decision_log":
+      return <DecisionLogBlock block={block} onUpdate={onUpdate} />;
+    case "mood_energy":
+      return <MoodEnergyBlock block={block} onUpdate={onUpdate} />;
+    case "sprint":
+      return <SprintBlock block={block} onUpdate={onUpdate} />;
     default:
       return <ParagraphBlock block={block} onUpdate={onUpdate} onEnter={onEnter} onDelete={onDelete} onSlash={onSlash} focusId={focusId} />;
   }

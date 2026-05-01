@@ -61,6 +61,7 @@ const SecuritySettings = lazy(() => import("@/pages/SecuritySettings"));
 const NotificationSettings = lazy(() => import("@/pages/NotificationSettings"));
 const OneCrypto = lazy(() => import("@/pages/OneCrypto"));
 const OneNote = lazy(() => import("@/pages/OneNote"));
+const OneNoteTemplates = lazy(() => import("@/pages/onenote/Templates"));
 
 // ─── QueryClient — created OUTSIDE component to survive re-renders ────────────
 const queryClient = new QueryClient({
@@ -136,6 +137,7 @@ const App = () => (
                             <Route path="/settings/notifications" element={<NotificationSettings />} />
                             <Route path="/apps/crypto" element={<OneCrypto />} />
                             <Route path="/apps/onenote" element={<OneNote />} />
+                            <Route path="/apps/onenote/templates" element={<OneNoteTemplates />} />
                           </Route>
                         </Route>
 
