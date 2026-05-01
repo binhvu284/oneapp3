@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { cn } from "@/lib/utils";
 
 interface RevealSectionProps {
@@ -41,18 +42,20 @@ export function RevealSection({
   threshold = 0.1,
 }: RevealSectionProps) {
   const { ref, isVisible } = useScrollReveal({ threshold });
+  const reduceMotion = useReducedMotion();
 
   const animClass = animationClasses[animation];
+  const showAnimated = !reduceMotion;
 
   return (
     <div
       ref={ref}
       className={cn(
-        "transition-all duration-700 ease-out",
-        isVisible ? animClass.visible : animClass.hidden,
+        showAnimated && "transition-all duration-700 ease-out",
+        showAnimated ? (isVisible ? animClass.visible : animClass.hidden) : animClass.visible,
         className
       )}
-      style={{ transitionDelay: `${delay}ms` }}
+      style={showAnimated ? { transitionDelay: `${delay}ms` } : undefined}
     >
       {children}
     </div>

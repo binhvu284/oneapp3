@@ -22,6 +22,11 @@ const Features = lazy(() => import("@/pages/Features"));
 const About = lazy(() => import("@/pages/About"));
 const Community = lazy(() => import("@/pages/Community"));
 const DocsPage = lazy(() => import("@/pages/DocsPage"));
+const Pricing = lazy(() => import("@/pages/Pricing"));
+const Changelog = lazy(() => import("@/pages/Changelog"));
+const PublicLayout = lazy(() =>
+  import("@/components/website/PublicLayout").then((m) => ({ default: m.PublicLayout })),
+);
 const Login = lazy(() => import("@/pages/Login"));
 const ForgotPassword = lazy(() => import("@/pages/ForgotPassword"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
@@ -93,10 +98,15 @@ const App = () => (
                         {/* ── Public ── */}
                         <Route path="/explore" element={<ExplorePage />} />
                         <Route path="/home" element={<Navigate to="/explore" replace />} />
-                        <Route path="/ecosystem" element={<Features />} />
-                        <Route path="/journey" element={<About />} />
-                        <Route path="/forum" element={<Community />} />
                         <Route path="/docs" element={<DocsPage />} />
+                        {/* Public pages with shared header/footer */}
+                        <Route element={<PublicLayout />}>
+                          <Route path="/ecosystem" element={<Features />} />
+                          <Route path="/journey" element={<About />} />
+                          <Route path="/forum" element={<Community />} />
+                          <Route path="/pricing" element={<Pricing />} />
+                          <Route path="/changelog" element={<Changelog />} />
+                        </Route>
                         <Route path="/auth/login" element={<Login />} />
                         <Route path="/auth/forgot-password" element={<ForgotPassword />} />
                         <Route path="/auth/signup" element={<SignUpRoleSelection />} />

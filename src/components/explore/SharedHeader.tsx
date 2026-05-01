@@ -25,7 +25,8 @@ interface SharedHeaderProps {
 const navItems: NavItem[] = [
   { label: "Ecosystem", labelKey: "nav.features", href: "/ecosystem" },
   { label: "Journey", labelKey: "nav.about", href: "/journey" },
-  { label: "Forum", labelKey: "nav.community", href: "/forum" },
+  { label: "Pricing", labelKey: "nav.pricing", href: "/pricing" },
+  { label: "Changelog", labelKey: "nav.changelog", href: "/changelog" },
   { label: "Docs", labelKey: "nav.docs", href: "/docs" },
 ];
 
