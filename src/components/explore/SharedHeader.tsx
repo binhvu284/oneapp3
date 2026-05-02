@@ -74,7 +74,7 @@ export function SharedHeader({ variant = "standard", visible = true }: SharedHea
         }`}
       >
         <div
-          className={`mx-auto max-w-4xl flex items-center justify-between px-6 py-3 bg-gradient-to-r from-black/80 via-gray-900/90 to-black/80 backdrop-blur-2xl border border-cyan-500/30 rounded-full relative shadow-[0_0_30px_rgba(6,182,212,0.15),0_0_60px_rgba(6,182,212,0.05)] ${
+          className={`mx-auto max-w-4xl flex items-center justify-between px-6 py-3 bg-gradient-to-r from-[#050814]/90 via-[#0a0f2a]/95 to-[#050814]/90 backdrop-blur-2xl border border-indigo-500/30 rounded-full relative shadow-[0_0_30px_rgba(99,102,241,0.2),0_0_60px_rgba(99,102,241,0.07)] ${
             visible ? "animate-header-reveal" : "opacity-0 scale-x-0"
           }`}
         >
@@ -110,7 +110,7 @@ export function SharedHeader({ variant = "standard", visible = true }: SharedHea
                 onClick={() => navigate(item.href)}
                 onMouseEnter={() => handleMouseEnter(index)}
                 className={`relative z-10 px-4 py-2 text-sm font-medium transition-colors duration-200 ${
-                  activeIndex === index ? "text-cyan-400" : "text-white/70 hover:text-white"
+                  activeIndex === index ? "text-indigo-400" : "text-white/70 hover:text-white"
                 }`}
               >
                 {item.label}
@@ -127,7 +127,7 @@ export function SharedHeader({ variant = "standard", visible = true }: SharedHea
             </SheetTrigger>
             <SheetContent
               side="right"
-              className="w-[min(280px,85vw)] bg-black/95 backdrop-blur-xl border-l border-cyan-500/20 p-0"
+              className="w-[min(280px,85vw)] bg-[#050814]/98 backdrop-blur-xl border-l border-indigo-500/20 p-0"
             >
               {/* Mobile Menu Header */}
               <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
@@ -153,7 +153,7 @@ export function SharedHeader({ variant = "standard", visible = true }: SharedHea
                       navigate(item.href);
                       setMobileMenuOpen(false);
                     }}
-                    className="flex items-center px-4 py-3.5 text-white/70 hover:text-cyan-400 hover:bg-white/5 active:bg-white/10 rounded-xl transition-all duration-200 text-left text-sm font-medium animate-fade-in"
+                    className="flex items-center px-4 py-3.5 text-white/70 hover:text-indigo-400 hover:bg-white/5 active:bg-white/10 rounded-xl transition-all duration-200 text-left text-sm font-medium animate-fade-in"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     {item.label}
@@ -173,7 +173,7 @@ export function SharedHeader({ variant = "standard", visible = true }: SharedHea
                   Get Started
                 </button>
                 <p className="text-center text-xs text-white/30">
-                  OneApp v2.6.8
+                  OneApp v3.0
                 </p>
               </div>
             </SheetContent>
