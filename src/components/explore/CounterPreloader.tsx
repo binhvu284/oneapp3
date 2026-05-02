@@ -114,14 +114,32 @@ export function CounterPreloader({ onComplete }: CounterPreloaderProps) {
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] bg-black flex items-center justify-center transition-all duration-500 ${
+      className={`fixed inset-0 z-[9999] flex items-center justify-center transition-all duration-500 ${
         isExiting ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
+      style={{ background: "#030712" }}
     >
-      {/* Star background */}
+      {/* Cyberpunk grid */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(99,102,241,0.07) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(99,102,241,0.07) 1px, transparent 1px)
+          `,
+          backgroundSize: "64px 64px",
+        }}
+      />
+      {/* Radial fade */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: "radial-gradient(ellipse 70% 70% at 50% 50%, transparent 30%, #030712 100%)" }}
+      />
+
+      {/* Star particles (canvas) */}
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 pointer-events-none"
+        className="absolute inset-0 pointer-events-none opacity-30"
         style={{ background: "transparent" }}
       />
 
@@ -134,30 +152,57 @@ export function CounterPreloader({ onComplete }: CounterPreloaderProps) {
         {/* Logo + OneApp */}
         <div className="flex items-center gap-3">
           <img src={oneappLogo} alt="OneApp" className="w-10 h-10" />
-          <span className="text-white text-2xl font-bold tracking-wider">OneApp</span>
+          <span
+            className="text-2xl font-bold tracking-wider"
+            style={{
+              background: "linear-gradient(135deg, #818cf8, #60a5fa)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
+            OneApp
+          </span>
         </div>
 
         {/* Progress Bar with Counter */}
         <div className="w-64 md:w-80 flex flex-col items-center gap-2">
-          <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+          <div className="w-full h-[2px] bg-white/8 rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-75 ease-linear"
               style={{
                 width: `${count}%`,
-                background: "linear-gradient(90deg, #00F0FF, #00C4CC)",
+                background: "linear-gradient(90deg, #6366f1, #818cf8, #38bdf8)",
+                boxShadow: "0 0 8px rgba(99,102,241,0.6)",
               }}
             />
           </div>
-          <span className="text-white/70 text-xs font-thin tracking-wide">
-            {count}%
+          <span className="text-white/40 text-[11px] font-light tracking-[0.2em] tabular-nums">
+            {String(count).padStart(3, "0")}
           </span>
         </div>
 
-        {/* Subtext with blinking effect */}
-        <p className="text-white/50 text-sm font-light tracking-wide animate-pulse">
-          Greeting, welcome to <span className="text-cyan-400">OneApp</span>.
+        {/* Subtext */}
+        <p className="text-white/30 text-xs font-light tracking-[0.25em] uppercase">
+          Initializing <span className="text-indigo-400/80">v3.0</span>
         </p>
       </div>
+
+      {/* Corner accents */}
+      {(["top-4 left-4", "top-4 right-4", "bottom-4 left-4", "bottom-4 right-4"] as const).map(
+        (pos, i) => (
+          <div
+            key={pos}
+            className={`absolute ${pos} w-4 h-4 opacity-30 pointer-events-none`}
+            style={{
+              borderTop: i < 2 ? "1px solid rgba(99,102,241,0.5)" : "none",
+              borderBottom: i >= 2 ? "1px solid rgba(99,102,241,0.5)" : "none",
+              borderLeft: i % 2 === 0 ? "1px solid rgba(99,102,241,0.5)" : "none",
+              borderRight: i % 2 === 1 ? "1px solid rgba(99,102,241,0.5)" : "none",
+            }}
+          />
+        )
+      )}
     </div>
   );
 }

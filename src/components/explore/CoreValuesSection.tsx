@@ -101,7 +101,7 @@ export function CoreValuesSection() {
       )}
     >
       {/* Background subtle gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/[0.02] to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-indigo-500/[0.03] to-transparent pointer-events-none" />
 
       <div className="relative max-w-5xl mx-auto">
         {/* Section title - Phase 0 */}
@@ -125,8 +125,8 @@ export function CoreValuesSection() {
               transitionDelay: `${phaseDelays.header + 100}ms`,
             }}
           />
-          <p className="text-white/40 text-sm uppercase tracking-[0.2em]">
-            Let's begin our journey
+          <p className="text-indigo-400/60 text-xs uppercase tracking-[0.25em] font-medium">
+            The three pillars of v3.0
           </p>
         </div>
 
