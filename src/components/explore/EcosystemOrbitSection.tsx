@@ -187,17 +187,17 @@ export function EcosystemOrbitSection() {
           )}
           style={{ transitionDelay: "100ms" }}
         >
-          <p className="text-white/40 text-sm uppercase tracking-[0.2em] mb-3">
-            The Ecosystem
+          <p className="text-indigo-400/70 text-xs uppercase tracking-[0.25em] font-medium mb-3">
+            The ecosystem
           </p>
           <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
-            One Hub.{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
-              All Your Apps.
+            Six modules.{" "}
+            <span className="text-gradient-brand">
+              One intelligence.
             </span>
           </h2>
           <p className="mt-4 text-white/50 text-sm md:text-base max-w-md mx-auto">
-            OneApp is the center of your digital ecosystem — connecting every tool you use into one seamless experience.
+            Every module shares context. Your notes feed your AI. Your AI shapes your dashboard. In v3, everything thinks together.
           </p>
         </div>
 
@@ -236,7 +236,7 @@ export function EcosystemOrbitSection() {
                 className="orbit-ring"
                 cx="0" cy="0" r="160"
                 fill="none"
-                stroke="rgba(168, 85, 247, 0.2)"
+                stroke="rgba(99, 102, 241, 0.2)"
                 strokeWidth="1"
                 filter="url(#orbit-glow)"
               />
@@ -245,7 +245,7 @@ export function EcosystemOrbitSection() {
                 className="orbit-ring"
                 cx="0" cy="0" r="120"
                 fill="none"
-                stroke="rgba(0, 240, 255, 0.15)"
+                stroke="rgba(96, 165, 250, 0.15)"
                 strokeWidth="1"
                 filter="url(#orbit-glow)"
               />
@@ -254,7 +254,7 @@ export function EcosystemOrbitSection() {
                 className="orbit-ring"
                 cx="0" cy="0" r="80"
                 fill="none"
-                stroke="rgba(16, 185, 129, 0.1)"
+                stroke="rgba(99, 102, 241, 0.1)"
                 strokeWidth="1"
                 filter="url(#orbit-glow)"
               />

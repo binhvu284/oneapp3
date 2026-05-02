@@ -26,7 +26,7 @@ export function TimelineItem({ milestone, index }: TimelineItemProps) {
       {/* node on the center line */}
       <div
         aria-hidden
-        className="hidden md:block absolute left-1/2 -translate-x-1/2 top-1 w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_18px_rgba(0,240,255,0.65)] ring-4 ring-black"
+        className="hidden md:block absolute left-1/2 -translate-x-1/2 top-1 w-3 h-3 rounded-full bg-indigo-400 shadow-[0_0_18px_rgba(99,102,241,0.65)] ring-4 ring-[#030712]"
       />
 
       {/* spacer / content based on side */}
@@ -44,7 +44,7 @@ export function TimelineItem({ milestone, index }: TimelineItemProps) {
             alignRight ? "" : "md:justify-end"
           )}
         >
-          <span className="font-mono text-sm text-cyan-300 bg-cyan-500/10 border border-cyan-500/30 rounded-md px-2 py-0.5">
+          <span className="font-mono text-sm text-indigo-300 bg-indigo-500/10 border border-indigo-500/30 rounded-md px-2 py-0.5">
             {milestone.version}
           </span>
           <span className="text-xs text-gray-500">{milestone.date}</span>
@@ -62,7 +62,7 @@ export function TimelineItem({ milestone, index }: TimelineItemProps) {
                 alignRight ? "" : "md:flex-row-reverse md:text-right"
               )}
             >
-              <span className="w-1 h-1 rounded-full bg-cyan-500 mt-2 shrink-0" />
+              <span className="w-1 h-1 rounded-full bg-indigo-400 mt-2 shrink-0" />
               <span>{f}</span>
             </li>
           ))}
