@@ -21,8 +21,17 @@ export function GlobalCommandMenu() {
             }
         };
 
+        const handleQuickAction = (e: Event) => {
+            const detail = (e as CustomEvent<string>).detail;
+            if (detail === "open-command-palette") setOpen(true);
+        };
+
         document.addEventListener("keydown", down);
-        return () => document.removeEventListener("keydown", down);
+        window.addEventListener("oneapp:quick-action", handleQuickAction);
+        return () => {
+            document.removeEventListener("keydown", down);
+            window.removeEventListener("oneapp:quick-action", handleQuickAction);
+        };
     }, []);
 
     const runCommand = useCallback((command: () => unknown) => {
