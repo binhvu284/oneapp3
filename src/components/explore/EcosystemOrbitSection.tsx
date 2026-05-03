@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import { animate, stagger, createTimeline } from "animejs";
+import oneappLogo from "@/assets/oneapp-logo.png";
 import {
   StickyNote,
   Bitcoin,
@@ -188,7 +189,7 @@ export function EcosystemOrbitSection() {
           style={{ transitionDelay: "100ms" }}
         >
           <p className="text-indigo-400/70 text-xs uppercase tracking-[0.25em] font-medium mb-3">
-            The ecosystem
+            v3.0 Ecosystem
           </p>
           <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
             Six modules.{" "}
@@ -277,7 +278,7 @@ export function EcosystemOrbitSection() {
               <div
                 className="relative w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center shadow-[0_0_40px_rgba(168,85,247,0.5)]"
               >
-                <span className="text-white font-bold text-xl tracking-wider">O</span>
+                <img src={oneappLogo} alt="OneApp" className="w-9 h-9 object-contain" />
               </div>
             </div>
 
@@ -400,7 +401,7 @@ export function EcosystemOrbitSection() {
               >
                 <div className="absolute inset-0 rounded-full border border-cyan-500/40 animate-ping" style={{ animationDuration: "2s" }} />
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.5)]">
-                  <span className="text-white font-bold text-sm">O</span>
+                  <img src={oneappLogo} alt="OneApp" className="w-6 h-6 object-contain" />
                 </div>
               </div>
               {/* Connector line */}
