@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useLayoutEffect } from "react";
+import { useState, useEffect, useCallback, useLayoutEffect, lazy, Suspense } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Zap, Map, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -11,21 +11,31 @@ import { NavigationCard } from "@/components/explore/NavigationCard";
 import { SimpleFooter } from "@/components/explore/SimpleFooter";
 import { ParticleBackground } from "@/components/landing/ParticleBackground";
 import { RevealSection } from "@/components/explore/RevealSection";
-import { CoreValuesSection } from "@/components/explore/CoreValuesSection";
-import { EcosystemOrbitSection } from "@/components/explore/EcosystemOrbitSection";
-import { StatsSection } from "@/components/explore/StatsSection";
-import { FeaturesGridSection } from "@/components/explore/FeaturesGridSection";
 import { ScrollProgressRail } from "@/components/explore/ScrollProgressRail";
 import { DashboardMockup3D } from "@/components/explore/DashboardMockup3D";
-import { ComparisonSection } from "@/components/explore/ComparisonSection";
-import { FeatureDemoSection } from "@/components/explore/FeatureDemoSection";
-import { EverythingConnectedSection } from "@/components/explore/EverythingConnectedSection";
 import { useAppStore, STORE_MODULES } from "@/hooks/useAppStore";
 import { Button } from "@/components/ui/button";
 import { AppIcon } from "@/components/icons/AppIcon";
 import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useKonamiCode } from "@/hooks/useKonamiCode";
+
+// Lazy-load heavy below-fold sections to improve initial load
+const CoreValuesSection = lazy(() =>
+  import("@/components/explore/CoreValuesSection").then((m) => ({ default: m.CoreValuesSection }))
+);
+const EcosystemOrbitSection = lazy(() =>
+  import("@/components/explore/EcosystemOrbitSection").then((m) => ({ default: m.EcosystemOrbitSection }))
+);
+const ComparisonSection = lazy(() =>
+  import("@/components/explore/ComparisonSection").then((m) => ({ default: m.ComparisonSection }))
+);
+const FeatureDemoSection = lazy(() =>
+  import("@/components/explore/FeatureDemoSection").then((m) => ({ default: m.FeatureDemoSection }))
+);
+const EverythingConnectedSection = lazy(() =>
+  import("@/components/explore/EverythingConnectedSection").then((m) => ({ default: m.EverythingConnectedSection }))
+);
 
 export default function ExplorePage() {
   const navigate = useNavigate();
@@ -99,29 +109,21 @@ export default function ExplorePage() {
   }, []);
 
   useEffect(() => {
-    if (showPreloader || !introDone) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = showPreloader ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
-  }, [showPreloader, introDone]);
+  }, [showPreloader]);
 
   const { installedApps, toggleApp } = useAppStore();
 
-  const handlePreloaderComplete = () => {
-    // Scroll to top when preloader completes (extra safety)
+  const handlePreloaderComplete = useCallback(() => {
     window.scrollTo(0, 0);
     setShowPreloader(false);
-    // Header appears first
     setTimeout(() => setHeaderVisible(true), 100);
-    // Then hero section
     setTimeout(() => setContentVisible(true), 500);
-    // Start typing effect after content is visible
     setTimeout(() => startTyping(), 1200);
-  };
+  }, [startTyping]);
 
   const navigationCards = [
     {
@@ -265,11 +267,11 @@ export default function ExplorePage() {
                   </span>
                 ))}
               </span>
-              <span className="block text-gradient-brand">
+              <span className="block">
                 {"INFINITE CONTROL".split(" ").map((word, i) => (
                   <span
                     key={`${word}-${i}`}
-                    className="hero-word mr-3"
+                    className="hero-word text-gradient-brand mr-3"
                     style={{ animationDelay: `${(i + 2) * 80}ms` }}
                   >
                     {word}
@@ -311,26 +313,16 @@ export default function ExplorePage() {
           </section>
         )}
 
-        {/* Section 2: Core Values Constellation - Only mount after preloader */}
-        {!showPreloader && <CoreValuesSection key={location.key} />}
-
-        {/* Section 3: v2 vs v3 Comparison */}
-        {!showPreloader && <ComparisonSection />}
-
-        {/* Section 4: Interactive Feature Demos */}
-        {!showPreloader && <FeatureDemoSection />}
-
-        {/* Section 5: Everything Connected — showstopper orbit */}
-        {!showPreloader && <EverythingConnectedSection />}
-
-        {/* Section 6: Ecosystem Orbit */}
-        {!showPreloader && <EcosystemOrbitSection />}
-
-        {/* Section 7: Stats */}
-        {!showPreloader && <StatsSection />}
-
-        {/* Section 8: Features Grid */}
-        {!showPreloader && <FeaturesGridSection />}
+        {/* Below-fold sections — lazy loaded after preloader clears */}
+        {!showPreloader && (
+          <Suspense fallback={null}>
+            <CoreValuesSection key={location.key} />
+            <ComparisonSection />
+            <FeatureDemoSection />
+            <EverythingConnectedSection />
+            <EcosystemOrbitSection />
+          </Suspense>
+        )}
 
         {/* Navigation Cards Section */}
         <RevealSection animation="blur" className="py-14 sm:py-24 px-4 sm:px-6">
