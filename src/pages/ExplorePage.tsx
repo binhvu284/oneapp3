@@ -1,30 +1,90 @@
-import { useState, useEffect, useCallback, useLayoutEffect } from "react";
+import { useState, useEffect, useCallback, useLayoutEffect, lazy, Suspense } from "react";
 import { useLocation } from "react-router-dom";
 import { Zap, Map, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useAuthSource } from "@/hooks/useAuthSource";
 import { CounterPreloader } from "@/components/explore/CounterPreloader";
+import { CinematicIntro } from "@/components/explore/CinematicIntro";
 import { SharedHeader } from "@/components/explore/SharedHeader";
 import { GradientBlobs } from "@/components/explore/GradientBlobs";
 import { NavigationCard } from "@/components/explore/NavigationCard";
 import { SimpleFooter } from "@/components/explore/SimpleFooter";
 import { ParticleBackground } from "@/components/landing/ParticleBackground";
 import { RevealSection } from "@/components/explore/RevealSection";
-import { CoreValuesSection } from "@/components/explore/CoreValuesSection";
-import { EcosystemOrbitSection } from "@/components/explore/EcosystemOrbitSection";
+import { ScrollProgressRail } from "@/components/explore/ScrollProgressRail";
+import { DashboardMockup3D } from "@/components/explore/DashboardMockup3D";
 import { useAppStore, STORE_MODULES } from "@/hooks/useAppStore";
 import { Button } from "@/components/ui/button";
 import { AppIcon } from "@/components/icons/AppIcon";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useKonamiCode } from "@/hooks/useKonamiCode";
+
+// Lazy-load heavy below-fold sections to improve initial load
+const CoreValuesSection = lazy(() =>
+  import("@/components/explore/CoreValuesSection").then((m) => ({ default: m.CoreValuesSection }))
+);
+const EcosystemOrbitSection = lazy(() =>
+  import("@/components/explore/EcosystemOrbitSection").then((m) => ({ default: m.EcosystemOrbitSection }))
+);
+const ComparisonSection = lazy(() =>
+  import("@/components/explore/ComparisonSection").then((m) => ({ default: m.ComparisonSection }))
+);
+const FeatureDemoSection = lazy(() =>
+  import("@/components/explore/FeatureDemoSection").then((m) => ({ default: m.FeatureDemoSection }))
+);
+const EverythingConnectedSection = lazy(() =>
+  import("@/components/explore/EverythingConnectedSection").then((m) => ({ default: m.EverythingConnectedSection }))
+);
 
 export default function ExplorePage() {
   const location = useLocation();
   const { user } = useAuthSource();
+
+  // Show CinematicIntro on first session visit; show CounterPreloader on return visits
+  const [introDone] = useState(
+    () => typeof sessionStorage !== "undefined"
+      ? sessionStorage.getItem("oneapp-v3-intro-seen") === "1"
+      : true
+  );
   const [showPreloader, setShowPreloader] = useState(true);
   const [headerVisible, setHeaderVisible] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
   const [typedText, setTypedText] = useState("");
   const [showCursor, setShowCursor] = useState(false);
+  const [konamiBurst, setKonamiBurst] = useState(false);
+  const reduceMotion = useReducedMotion();
   const fullText = "Explore the magic of technology";
+
+  useDocumentMeta({
+    title: "OneApp — One System, Infinite Control",
+    description:
+      "OneApp is the founder's operating system: notes, tasks, AI, crypto, deploys — all in one personal workspace.",
+    canonicalPath: "/explore",
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          name: "OneApp",
+          url: typeof window !== "undefined" ? window.location.origin : "https://oneapp.app",
+        },
+        {
+          "@type": "WebSite",
+          name: "OneApp",
+          url: typeof window !== "undefined" ? window.location.origin : "https://oneapp.app",
+        },
+      ],
+    },
+  });
+
+  useKonamiCode(() => {
+    if (reduceMotion) return;
+    setKonamiBurst(true);
+    // eslint-disable-next-line no-console
+    console.log("%c⌁ founder mode unlocked ⌁", "color:#00F0FF;font-weight:700;");
+    setTimeout(() => setKonamiBurst(false), 2400);
+  });
 
   const startTyping = useCallback(() => {
     setShowCursor(true);
@@ -47,16 +107,15 @@ export default function ExplorePage() {
   }, []);
 
   useEffect(() => {
-    if (showPreloader) {
+    if (showPreloader || !introDone) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
     }
-    // Cleanup on unmount
     return () => {
       document.body.style.overflow = "";
     };
-  }, [showPreloader]);
+  }, [showPreloader, introDone]);
 
   const { installedApps, toggleApp } = useAppStore();
 
@@ -73,19 +132,19 @@ export default function ExplorePage() {
       title: "The Ecosystem",
       description: "Core technologies and spin-offs that power your experience.",
       icon: Zap,
-      href: "/features",
+      href: "/ecosystem",
     },
     {
       title: "The Journey",
       description: "From idea to reality – our story and vision for the future.",
       icon: Map,
-      href: "/about",
+      href: "/journey",
     },
     {
       title: "Intel Forum",
       description: "Exclusive access to insights, updates, and community discussions.",
       icon: Users,
-      href: "/community",
+      href: "/forum",
     },
   ];
 
@@ -129,54 +188,91 @@ export default function ExplorePage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden relative">
+    <div className="min-h-screen bg-[#050814] text-white overflow-x-hidden relative">
       {/* Star Background */}
       <ParticleBackground />
 
-      {/* Preloader */}
-      {showPreloader && <CounterPreloader onComplete={handlePreloaderComplete} />}
+      {/* Cinematic intro — first session visit only */}
+      {!introDone && (
+        <CinematicIntro onComplete={handlePreloaderComplete} />
+      )}
 
-      {/* Fixed Header - Always on top, separate from scrollable content */}
+      {/* Counter preloader — return visits */}
+      {introDone && showPreloader && <CounterPreloader onComplete={handlePreloaderComplete} />}
+
+      {/* Fixed Header */}
       <SharedHeader variant="floating" visible={headerVisible} />
+
+      {/* Scroll storytelling rail (desktop only) */}
+      {!showPreloader && <ScrollProgressRail />}
+
+      {/* Konami easter egg overlay */}
+      {konamiBurst && (
+        <div
+          aria-hidden
+          className="pointer-events-none fixed inset-0 z-40 animate-[konami-flash_2.4s_ease-out_forwards]"
+          style={{
+            background:
+              "radial-gradient(circle at center, rgba(0,240,255,0.18) 0%, transparent 60%)",
+          }}
+        />
+      )}
+      <style>{`
+        @keyframes konami-flash {
+          0%   { opacity: 0; }
+          15%  { opacity: 1; }
+          100% { opacity: 0; }
+        }
+        @keyframes hero-word-in {
+          from { opacity: 0; transform: translateY(20px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .hero-word {
+          display: inline-block;
+          opacity: 0;
+          animation: hero-word-in 0.6s cubic-bezier(0.16,1,0.3,1) forwards;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-word { animation: none; opacity: 1; }
+        }
+      `}</style>
 
       {/* Main Content */}
       <div
-        className={`transition-all duration-700 ${contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
+        className={`transition-all duration-700 ${contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
       >
-        {/* Hero Section — use svh for mobile browser chrome support */}
+        {/* Hero Section */}
         <section className="relative min-h-[100svh] flex items-center justify-center overflow-hidden">
+          {/* Cyberpunk grid overlay */}
+          <div className="absolute inset-0 bg-cyber-grid opacity-100 pointer-events-none" />
+          <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 80% 80% at 50% 50%, transparent 40%, #050814 100%)" }} />
           <GradientBlobs />
 
           <div className="relative z-10 text-center px-5 sm:px-8 w-full max-w-4xl mx-auto">
             {/* Badge */}
-            <Badge className="mb-5 sm:mb-6 bg-white/10 text-white/80 border-white/20 backdrop-blur-sm px-3 sm:px-4 py-1 sm:py-1.5 text-[10px] sm:text-xs uppercase tracking-[0.2em] font-medium">
-              Welcome to OneApp 2.0
+            <Badge className="mb-5 sm:mb-6 bg-indigo-500/10 text-indigo-300 border-indigo-500/30 backdrop-blur-sm px-3 sm:px-4 py-1 sm:py-1.5 text-[10px] sm:text-xs uppercase tracking-[0.2em] font-medium shadow-[0_0_12px_rgba(99,102,241,0.2)]">
+              Welcome to OneApp 3.0
             </Badge>
 
-            {/* Main Headline — word-by-word stagger */}
+            {/* Main Headline — word-by-word staggered entrance */}
             <h1 className="text-4xl sm:text-6xl md:text-8xl font-bold tracking-tight leading-[1.05]">
-              <span className="block">
-                {["ONE", "SYSTEM"].map((word, i) => (
+              <span className="block text-glow-brand">
+                {"ONE SYSTEM".split(" ").map((word, i) => (
                   <span
-                    key={word}
-                    className={`inline-block mr-[0.3em] last:mr-0 transition-all duration-500 ease-out ${
-                      contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-                    }`}
-                    style={{ transitionDelay: `${i * 80}ms` }}
+                    key={`${word}-${i}`}
+                    className="hero-word mr-3"
+                    style={{ animationDelay: `${i * 80}ms` }}
                   >
                     {word}
                   </span>
                 ))}
               </span>
               <span className="block">
-                {["INFINITE", "CONTROL"].map((word, i) => (
+                {"INFINITE CONTROL".split(" ").map((word, i) => (
                   <span
-                    key={word}
-                    className={`inline-block mr-[0.3em] last:mr-0 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-600 transition-all duration-500 ease-out ${
-                      contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-                    }`}
-                    style={{ transitionDelay: `${(2 + i) * 80}ms` }}
+                    key={`${word}-${i}`}
+                    className="hero-word text-gradient-brand mr-3"
+                    style={{ animationDelay: `${(i + 2) * 80}ms` }}
                   >
                     {word}
                   </span>
@@ -188,7 +284,7 @@ export default function ExplorePage() {
             <p className="mt-4 sm:mt-6 text-gray-400 text-sm sm:text-base md:text-lg font-light tracking-wide h-6 sm:h-7">
               {typedText}
               {showCursor && (
-                <span className="inline-block w-[2px] h-4 sm:h-5 bg-cyan-400 ml-1 animate-pulse" />
+                <span className="inline-block w-[2px] h-4 sm:h-5 bg-indigo-400 ml-1 animate-pulse" />
               )}
             </p>
 
@@ -202,19 +298,31 @@ export default function ExplorePage() {
           <div className="hidden sm:flex absolute bottom-10 left-1/2 -translate-x-1/2 flex-col items-center gap-1.5">
             <span className="text-white/25 text-[10px] tracking-[0.3em] uppercase">scroll</span>
             <div className="flex flex-col items-center gap-1 animate-bounce">
-              <div className="w-px h-8 bg-gradient-to-b from-cyan-500/60 to-transparent" />
+              <div className="w-px h-8 bg-gradient-to-b from-indigo-500/60 to-transparent" />
               <svg width="12" height="7" viewBox="0 0 12 7" fill="none">
-                <path d="M1 1L6 6L11 1" stroke="rgba(0,240,255,0.5)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M1 1L6 6L11 1" stroke="rgba(99,102,241,0.6)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
           </div>
         </section>
 
-        {/* Section 2: Core Values Constellation - Only mount after preloader */}
-        {!showPreloader && <CoreValuesSection key={location.key} />}
+        {/* 3D Dashboard Mockup */}
+        {!showPreloader && (
+          <section className="relative px-4 sm:px-6 pb-16 sm:pb-24">
+            <DashboardMockup3D />
+          </section>
+        )}
 
-        {/* Section 3: Ecosystem Orbit */}
-        {!showPreloader && <EcosystemOrbitSection />}
+        {/* Below-fold sections — lazy loaded after preloader clears */}
+        {!showPreloader && (
+          <Suspense fallback={null}>
+            <CoreValuesSection key={location.key} />
+            <ComparisonSection />
+            <FeatureDemoSection />
+            <EverythingConnectedSection />
+            <EcosystemOrbitSection />
+          </Suspense>
+        )}
 
         {/* Navigation Cards Section */}
         <RevealSection animation="blur" className="py-14 sm:py-24 px-4 sm:px-6">
