@@ -27,13 +27,13 @@
 
 ## Schema changes staged (Phase 4)
 
-| Object                                 | Change                                 | Migration          | Applied?       |
-| -------------------------------------- | -------------------------------------- | ------------------ | -------------- |
-| `user_settings.theme_preset`           | New column (text default `'midnight'`) | `20260611120000_*` | No (file only) |
-| `user_settings.accent_hue`             | New column (integer default `186`)     | `20260611120000_*` | No (file only) |
-| `user_settings.sidebar_pinned_actions` | New column (jsonb default `[]`)        | `20260611120000_*` | No (file only) |
+| Object                                 | Change                                 | Migration          | Applied?                             |
+| -------------------------------------- | -------------------------------------- | ------------------ | ------------------------------------ |
+| `user_settings.theme_preset`           | New column (text default `'midnight'`) | `20260611120000_*` | ✅ Applied to `gvcelxiwxqkzgfpxkiuv` |
+| `user_settings.accent_hue`             | New column (integer default `186`)     | `20260611120000_*` | ✅ Applied to `gvcelxiwxqkzgfpxkiuv` |
+| `user_settings.sidebar_pinned_actions` | New column (jsonb default `[]`)        | `20260611120000_*` | ✅ Applied to `gvcelxiwxqkzgfpxkiuv` |
 
-Apply via the Supabase migration workflow when M4/M6 consume these columns.
+All 25 migrations (including full base schema) applied to the new project `gvcelxiwxqkzgfpxkiuv` (oneapp3, ap-northeast-1).
 
 ## Feature flags
 
@@ -76,6 +76,11 @@ momentum overshoot, spring toasts) adopt the same tokens as components migrate.
 
 ## Deferred (manual/CI — cannot run headless in agent env)
 
-- Visual check of the `neu` variant and micro-interactions in-app (light + dark).
-- Apply the Phase 4 migration to the remote Supabase project (blocked: the app's
-  configured project `fzxetyomesoojyhhrhnh` is outside the connected Supabase org).
+- Visual check of the `neu` variant, micro-interactions, and cinematic transitions in-app (light + dark, reduced-motion).
+
+## Supabase
+
+- **Project:** `gvcelxiwxqkzgfpxkiuv` (oneapp3, ap-northeast-1) — `ACTIVE_HEALTHY`
+- **URL:** `https://gvcelxiwxqkzgfpxkiuv.supabase.co`
+- All 25 migrations applied (full schema including P4 columns).
+- `.env` updated to point to this project.
