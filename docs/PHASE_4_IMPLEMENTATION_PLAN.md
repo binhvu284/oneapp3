@@ -3,7 +3,7 @@
 > **Source:** [ONEAPP_3_PRD.md](./ONEAPP_3_PRD.md), Section 6
 > **Phase:** P4 — Interface 3.0
 > **Estimated duration:** 5–6 weeks (solo builder)
-> **Status:** In progress (M0–M2 shipped)
+> **Status:** In progress (M0–M3 shipped)
 
 This document translates the PRD Phase 4 requirements into a sequenced engineering
 plan. Phase 4 gives OneApp a unique visual identity — high-tech minimal with
@@ -37,7 +37,7 @@ neumorphic dark surfaces, cinematic transitions, and tactile micro-interactions 
 | M0  | Scaffold — flags + theme-engine migration + docs    | 6.4      | —          | 2 d  | ✅     |
 | M1  | Neumorphic Design System (tokens + opt-in variants) | 6.3 F4.1 | M0         | 5 d  | ✅     |
 | M2  | Micro-Interaction Library                           | 6.3 F4.2 | M1         | 5 d  | ✅     |
-| M3  | Cinematic Transition System                         | 6.3 F4.3 | M1         | 5 d  | ⬜     |
+| M3  | Cinematic Transition System                         | 6.3 F4.3 | M1         | 5 d  | ✅     |
 | M4  | OneApp Theme Engine + accent-hue system             | 6.3 F4.5 | M0, M1     | 5 d  | ⬜     |
 | M5  | Canvas Dashboard 3.0 widgets                        | 6.3 F4.4 | M1         | 6 d  | ⬜     |
 | M6  | Sidebar 3.0 + hardening, tests, docs                | 6.3 F4.6 | all        | 5 d  | ⬜     |
@@ -106,10 +106,28 @@ on, and fall back to static markup otherwise; existing components untouched.
 **Follow-ups (adopt the same tokens as components migrate):** checkbox SVG
 path-draw, toggle momentum overshoot, sidebar hover left-border, spring toasts.
 
-## 5. M3 — Cinematic Transition System (PRD §6.3 F4.3)
+## 5. M3 — Cinematic Transition System (✅ shipped, PRD §6.3 F4.3)
 
-Module-switch fade/slide (200/400ms), route-change top progress bar, login assemble
-sequence (anime.js), deploy-success overlay. Hook into the app shell / router.
+**Files added:**
+
+- `src/components/motion/RouteProgressBar.tsx` — thin `bg-primary` bar at viewport top;
+  state machine `hidden→loading→complete` driven by `useLocation` + `setTimeout`.
+  Grows 0→85% (EXPO_OUT, 300ms) on nav start, completes to 100% then fades out. Returns
+  `null` when `useMicroInteractions()` is false.
+- `src/components/motion/PageTransition.tsx` — `AnimatePresence mode="wait"` keyed on
+  `location.pathname`; exit opacity→0 (200ms), enter y+20px→0 + opacity→1 (400ms EXPO_OUT).
+  Falls back to plain `<div>` wrapper when micro-interactions are off.
+- `src/test/cinematic.test.tsx` — 4 render tests for both primitives.
+
+**Files modified:**
+
+- `src/components/layout/AppLayout.tsx` — replaced inline `AnimatePresence`/`motion.div`
+  block with `<PageTransition className={…}><Outlet /></PageTransition>`.
+- `src/App.tsx` — `<RouteProgressBar />` mounted in the app shell (inside `BrowserRouter`,
+  outside `<Suspense>`/`<Routes>`) alongside `<Sonner />`.
+
+**Exit criteria:** bar plays on every navigation; pages fade+slide in/out; no animation when
+`FF_MICRO_INTERACTIONS` is OFF or `prefers-reduced-motion` is set; existing layout unchanged.
 
 ## 6. M4 — OneApp Theme Engine (PRD §6.3 F4.5)
 

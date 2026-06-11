@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useLayoutSettings } from "@/hooks/useLayoutSettings";
 import { GlobalCommandMenu } from "@/components/GlobalCommandMenu";
-import { AnimatePresence, motion } from "framer-motion";
+import { PageTransition } from "@/components/motion/PageTransition";
 
 export function AppLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -103,18 +103,9 @@ export function AppLayout() {
             isBlockLayout && "rounded-xl"
           )}
         >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={location.pathname}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.25, ease: "easeInOut" }}
-              className={cn("h-full w-full", isAIChatRoute && "max-h-full")}
-            >
-              <Outlet />
-            </motion.div>
-          </AnimatePresence>
+          <PageTransition className={cn("h-full w-full", isAIChatRoute && "max-h-full")}>
+            <Outlet />
+          </PageTransition>
         </main>
       </div>
 

@@ -14,6 +14,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { PageLoader } from "@/components/PageLoader";
+import { RouteProgressBar } from "@/components/motion/RouteProgressBar";
 
 // ─── Lazy-loaded pages ────────────────────────────────────────────────────────
 // Public pages
@@ -93,6 +94,7 @@ const App = () => (
                     <SchemaSync />
                     <Toaster />
                     <Sonner />
+                    <RouteProgressBar />
                     <Suspense fallback={<PageLoader />}>
                       <Routes>
                         {/* ── Public ── */}

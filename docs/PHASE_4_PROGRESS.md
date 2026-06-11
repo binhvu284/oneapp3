@@ -5,7 +5,7 @@
 > [`PHASE_4_IMPLEMENTATION_PLAN.md`](./PHASE_4_IMPLEMENTATION_PLAN.md).
 > Updated as each milestone lands.
 
-**Last updated:** 2026-06-11
+**Last updated:** 2026-06-11 (M3 shipped)
 
 ## Status legend
 
@@ -20,7 +20,7 @@
 | M0  | Scaffold — flags + theme-engine migration + docs    | ✅     | `PHASE_4_FLAGS`, migration `20260611120000_*` (file only), this tracker + plan doc.                                                                     |
 | M1  | Neumorphic Design System (tokens + opt-in variants) | ✅     | `--neu-*` tokens, `.neu-card` utility, `<Card variant="neu">`, `<Button variant="neu">`.                                                                |
 | M2  | Micro-Interaction Library                           | ✅     | Motion tokens (`src/lib/motion.ts`), `useMicroInteractions` gate, `Pressable` + `Stagger` primitives. Per-element adoption rolls out opportunistically. |
-| M3  | Cinematic Transition System                         | ⬜     | Module/route transitions, progress bar, login assemble. Future session.                                                                                 |
+| M3  | Cinematic Transition System                         | ✅     | `RouteProgressBar`, `PageTransition`; wired into `App.tsx` + `AppLayout`.                                                                               |
 | M4  | OneApp Theme Engine + accent-hue system             | ⬜     | `/settings/appearance/themes`, 6 presets + custom hue. Future session.                                                                                  |
 | M5  | Canvas Dashboard 3.0 widgets                        | ⬜     | New widget registry entries with spring drag-in. Future session.                                                                                        |
 | M6  | Sidebar 3.0 + hardening, tests, docs                | ⬜     | Activity feed, pinned actions, pulse strip. Future session.                                                                                             |
@@ -48,7 +48,7 @@ To roll out in production, set each `VITE_FF_*` to `1` (or `true`) and rebuild.
 ## Verification status
 
 - `npm run lint` — passes (0 errors)
-- `npm run test` — passes (33 total; +7 for the motion library in `src/test/motion.test.tsx`)
+- `npm run test` — passes (37 total; +4 for cinematic transitions in `src/test/cinematic.test.tsx`)
 - `npm run build` — passes (CSS tokens + opt-in variants + motion primitives compile cleanly)
 
 ## M2 — Micro-Interaction Library (files)
@@ -63,6 +63,16 @@ To roll out in production, set each `VITE_FF_*` to `1` (or `true`) and rebuild.
 The library is non-breaking and opt-in: existing components are unchanged until they
 adopt these primitives. Remaining F4.2 interactions (checkbox path-draw, toggle
 momentum overshoot, spring toasts) adopt the same tokens as components migrate.
+
+## M3 — Cinematic Transition System (files)
+
+| Path                                         | Purpose                                                                 |
+| -------------------------------------------- | ----------------------------------------------------------------------- |
+| `src/components/motion/RouteProgressBar.tsx` | Thin accent bar at viewport top; plays on every route change.           |
+| `src/components/motion/PageTransition.tsx`   | `AnimatePresence` wrapper: exit 200ms fade, enter 400ms EXPO_OUT slide. |
+| `src/components/layout/AppLayout.tsx`        | Replaced inline `AnimatePresence` block with `<PageTransition>`.        |
+| `src/App.tsx`                                | `<RouteProgressBar />` mounted alongside `<Sonner />` in shell.         |
+| `src/test/cinematic.test.tsx`                | 4 render tests covering both primitives.                                |
 
 ## Deferred (manual/CI — cannot run headless in agent env)
 
