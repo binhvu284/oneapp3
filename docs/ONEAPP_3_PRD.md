@@ -1,9 +1,9 @@
 # OneApp 3 — Product Requirements Document (PRD)
 
 > **Version:** 3.0.0  
-> **Status:** Phase 1 ✅ shipped, Phase 5 🟡 in progress  
+> **Status:** Phase 1 ✅ shipped, Phase 5 ✅ shipped, Phase 4 🟡 in progress  
 > **Author:** Thomas (Solo Founder)  
-> **Last Updated:** 2026-05-01  
+> **Last Updated:** 2026-06-11  
 > **Source Codebase:** https://github.com/binhvu284/oneapp-2.6.8  
 > **Current Live App:** https://oneapp-2.vercel.app
 
@@ -79,8 +79,8 @@ OneApp 3 is built in **8 sequential phases**. Each phase is independently shippa
 | P1    | OneNote 3.0            | Core upgrade     | 5–7 weeks | ✅ shipped     |
 | P2    | OneCommand             | New module       | 4–5 weeks | ⬜ not started |
 | P3    | OneAI 3.0              | Deep upgrade     | 4–6 weeks | ⬜ not started |
-| P4    | Interface 3.0          | New phase        | 5–6 weeks | ⬜ not started |
-| P5    | Website 3.0            | New phase        | 4–5 weeks | 🟡 in progress |
+| P4    | Interface 3.0          | New phase        | 5–6 weeks | 🟡 in progress |
+| P5    | Website 3.0            | New phase        | 4–5 weeks | ✅ shipped     |
 | P6    | User Hierarchy 3.0     | Complete rebuild | 4–5 weeks | ⬜ not started |
 | P7    | OneApp Data 3.0        | Deep upgrade     | 4–5 weeks | ⬜ not started |
 | P8    | OneCrypto 3.0 + Polish | Upgrade + debt   | 3–4 weeks | ⬜ not started |
