@@ -15,15 +15,15 @@
 
 ## Milestones
 
-| #   | Milestone                                           | Status | Notes                                                                                    |
-| --- | --------------------------------------------------- | ------ | ---------------------------------------------------------------------------------------- |
-| M0  | Scaffold — flags + theme-engine migration + docs    | ✅     | `PHASE_4_FLAGS`, migration `20260611120000_*` (file only), this tracker + plan doc.      |
-| M1  | Neumorphic Design System (tokens + opt-in variants) | ✅     | `--neu-*` tokens, `.neu-card` utility, `<Card variant="neu">`, `<Button variant="neu">`. |
-| M2  | Micro-Interaction Library                           | ⬜     | Framer Motion press/draw/overshoot set. Future session.                                  |
-| M3  | Cinematic Transition System                         | ⬜     | Module/route transitions, progress bar, login assemble. Future session.                  |
-| M4  | OneApp Theme Engine + accent-hue system             | ⬜     | `/settings/appearance/themes`, 6 presets + custom hue. Future session.                   |
-| M5  | Canvas Dashboard 3.0 widgets                        | ⬜     | New widget registry entries with spring drag-in. Future session.                         |
-| M6  | Sidebar 3.0 + hardening, tests, docs                | ⬜     | Activity feed, pinned actions, pulse strip. Future session.                              |
+| #   | Milestone                                           | Status | Notes                                                                                                                                                   |
+| --- | --------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| M0  | Scaffold — flags + theme-engine migration + docs    | ✅     | `PHASE_4_FLAGS`, migration `20260611120000_*` (file only), this tracker + plan doc.                                                                     |
+| M1  | Neumorphic Design System (tokens + opt-in variants) | ✅     | `--neu-*` tokens, `.neu-card` utility, `<Card variant="neu">`, `<Button variant="neu">`.                                                                |
+| M2  | Micro-Interaction Library                           | ✅     | Motion tokens (`src/lib/motion.ts`), `useMicroInteractions` gate, `Pressable` + `Stagger` primitives. Per-element adoption rolls out opportunistically. |
+| M3  | Cinematic Transition System                         | ⬜     | Module/route transitions, progress bar, login assemble. Future session.                                                                                 |
+| M4  | OneApp Theme Engine + accent-hue system             | ⬜     | `/settings/appearance/themes`, 6 presets + custom hue. Future session.                                                                                  |
+| M5  | Canvas Dashboard 3.0 widgets                        | ⬜     | New widget registry entries with spring drag-in. Future session.                                                                                        |
+| M6  | Sidebar 3.0 + hardening, tests, docs                | ⬜     | Activity feed, pinned actions, pulse strip. Future session.                                                                                             |
 
 ## Schema changes staged (Phase 4)
 
@@ -48,10 +48,24 @@ To roll out in production, set each `VITE_FF_*` to `1` (or `true`) and rebuild.
 ## Verification status
 
 - `npm run lint` — passes (0 errors)
-- `npm run test` — passes
-- `npm run build` — passes (CSS tokens + opt-in variants compile cleanly)
+- `npm run test` — passes (33 total; +7 for the motion library in `src/test/motion.test.tsx`)
+- `npm run build` — passes (CSS tokens + opt-in variants + motion primitives compile cleanly)
+
+## M2 — Micro-Interaction Library (files)
+
+| Path                                  | Purpose                                                         |
+| ------------------------------------- | --------------------------------------------------------------- |
+| `src/lib/motion.ts`                   | Shared easing/timing/spring tokens + reusable Framer variants.  |
+| `src/hooks/useMicroInteractions.ts`   | Gate: `FF_MICRO_INTERACTIONS` AND not `prefers-reduced-motion`. |
+| `src/components/motion/Pressable.tsx` | Tactile press (scale 0.96 / 120ms) for any tappable surface.    |
+| `src/components/motion/Stagger.tsx`   | Staggered fade+slide reveal (`Stagger` + `StaggerItem`).        |
+
+The library is non-breaking and opt-in: existing components are unchanged until they
+adopt these primitives. Remaining F4.2 interactions (checkbox path-draw, toggle
+momentum overshoot, spring toasts) adopt the same tokens as components migrate.
 
 ## Deferred (manual/CI — cannot run headless in agent env)
 
-- Visual check of the `neu` variant in-app (light + dark).
-- Apply the Phase 4 migration to the remote Supabase project.
+- Visual check of the `neu` variant and micro-interactions in-app (light + dark).
+- Apply the Phase 4 migration to the remote Supabase project (blocked: the app's
+  configured project `fzxetyomesoojyhhrhnh` is outside the connected Supabase org).

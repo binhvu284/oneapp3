@@ -3,7 +3,7 @@
 > **Source:** [ONEAPP_3_PRD.md](./ONEAPP_3_PRD.md), Section 6
 > **Phase:** P4 — Interface 3.0
 > **Estimated duration:** 5–6 weeks (solo builder)
-> **Status:** In progress (M0–M1 shipped)
+> **Status:** In progress (M0–M2 shipped)
 
 This document translates the PRD Phase 4 requirements into a sequenced engineering
 plan. Phase 4 gives OneApp a unique visual identity — high-tech minimal with
@@ -36,7 +36,7 @@ neumorphic dark surfaces, cinematic transitions, and tactile micro-interactions 
 | --- | --------------------------------------------------- | -------- | ---------- | ---- | ------ |
 | M0  | Scaffold — flags + theme-engine migration + docs    | 6.4      | —          | 2 d  | ✅     |
 | M1  | Neumorphic Design System (tokens + opt-in variants) | 6.3 F4.1 | M0         | 5 d  | ✅     |
-| M2  | Micro-Interaction Library                           | 6.3 F4.2 | M1         | 5 d  | ⬜     |
+| M2  | Micro-Interaction Library                           | 6.3 F4.2 | M1         | 5 d  | ✅     |
 | M3  | Cinematic Transition System                         | 6.3 F4.3 | M1         | 5 d  | ⬜     |
 | M4  | OneApp Theme Engine + accent-hue system             | 6.3 F4.5 | M0, M1     | 5 d  | ⬜     |
 | M5  | Canvas Dashboard 3.0 widgets                        | 6.3 F4.4 | M1         | 6 d  | ⬜     |
@@ -87,13 +87,24 @@ embossed surface that inverts to a pressed state on `:active`; flat defaults unc
 
 ---
 
-## 4. M2 — Micro-Interaction Library (PRD §6.3 F4.2)
+## 4. M2 — Micro-Interaction Library (✅ shipped, PRD §6.3 F4.2)
 
-Framer Motion interaction set, gated on `FF_MICRO_INTERACTIONS` + reduced-motion:
-button press `scale(0.96)` + shadow invert (120ms); checkbox SVG path draw; toggle
-momentum overshoot; sidebar hover left-border reveal; card hover lift; staggered
-dropdown items; spring toast entrance. Land as a small set of reusable wrappers/
-variants under `src/components/ui/` and `src/components/motion/`.
+**Files added:**
+
+- `src/lib/motion.ts` — shared easing (`EXPO_OUT`), `TIMING`, `springs`, and
+  reusable Framer Motion variants (`pressVariants`, `cardHover`, `staggerContainer`,
+  `staggerItem`).
+- `src/hooks/useMicroInteractions.ts` — gate returning true only when
+  `FF_MICRO_INTERACTIONS` is on and the user hasn't requested reduced motion.
+- `src/components/motion/Pressable.tsx` — press feedback (scale 0.96 / 120ms).
+- `src/components/motion/Stagger.tsx` — `Stagger` + `StaggerItem` staggered reveal.
+- `src/test/motion.test.tsx` — tokens + component render coverage (7 tests).
+
+**Exit criteria:** primitives render their children, animate only when the gate is
+on, and fall back to static markup otherwise; existing components untouched.
+
+**Follow-ups (adopt the same tokens as components migrate):** checkbox SVG
+path-draw, toggle momentum overshoot, sidebar hover left-border, spring toasts.
 
 ## 5. M3 — Cinematic Transition System (PRD §6.3 F4.3)
 
