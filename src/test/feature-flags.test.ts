@@ -33,6 +33,8 @@ describe("feature flags", () => {
       "FF_NEU_DESIGN",
       "FF_THEME_ENGINE",
       "FF_MICRO_INTERACTIONS",
+      "FF_CANVAS_WIDGETS",
+      "FF_SIDEBAR_3",
     ]);
     for (const value of Object.values(PHASE_4_FLAGS)) {
       expect(typeof value).toBe("boolean");

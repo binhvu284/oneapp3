@@ -11,6 +11,8 @@ import { DashboardToolbar } from "./DashboardToolbar";
 import { AddWidgetDialog } from "./AddWidgetDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useMicroInteractions } from "@/hooks/useMicroInteractions";
+import { cn } from "@/lib/utils";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -22,6 +24,7 @@ export function DashboardGrid() {
   const [isEditing, setIsEditing] = useState(false);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const isMobile = useIsMobile();
+  const motionOn = useMicroInteractions();
 
   const onLayoutChange = useCallback(
     (_: Layout[], allLayouts: Layouts) => {
@@ -123,7 +126,7 @@ export function DashboardGrid() {
           }`}
       >
         <ResponsiveGridLayout
-          className="layout"
+          className={cn("layout", motionOn && "dashboard-spring")}
           layouts={layouts}
           breakpoints={BREAKPOINTS}
           cols={COLS}
@@ -143,19 +146,23 @@ export function DashboardGrid() {
             const Comp = def.component;
             return (
               <div key={widget.id}>
-                <WidgetWrapper
-                  title={widget.title}
-                  widgetType={widget.type}
-                  isEditing={isEditing}
-                  onRemove={() => removeWidget(widget.id)}
-                  config={widget.config}
-                  onConfigChange={(c) => updateWidgetConfig(widget.id, c)}
-                >
-                  <Comp
+                {/* Inner wrapper carries the entrance animation so it never fights
+                    react-grid-layout's positioning transform on the grid item. */}
+                <div className={cn("h-full", motionOn && "animate-widget-drop")}>
+                  <WidgetWrapper
+                    title={widget.title}
+                    widgetType={widget.type}
+                    isEditing={isEditing}
+                    onRemove={() => removeWidget(widget.id)}
                     config={widget.config}
                     onConfigChange={(c) => updateWidgetConfig(widget.id, c)}
-                  />
-                </WidgetWrapper>
+                  >
+                    <Comp
+                      config={widget.config}
+                      onConfigChange={(c) => updateWidgetConfig(widget.id, c)}
+                    />
+                  </WidgetWrapper>
+                </div>
               </div>
             );
           })}
