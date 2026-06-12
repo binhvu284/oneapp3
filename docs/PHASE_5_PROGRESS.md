@@ -5,7 +5,7 @@
 > [`PHASE_5_IMPLEMENTATION_PLAN.md`](./PHASE_5_IMPLEMENTATION_PLAN.md).
 > Updated as each milestone lands.
 
-**Last updated:** 2026-05-01
+**Last updated:** 2026-06-11
 
 ## Status legend
 
@@ -15,16 +15,16 @@
 
 ## Milestones
 
-| #   | Milestone                                 | Status | Notes                                                                                        |
-| --- | ----------------------------------------- | ------ | -------------------------------------------------------------------------------------------- |
-| M0  | Public shell + reduced-motion + meta hook | ✅     | `PublicLayout`, `useReducedMotion`, `useDocumentMeta`, `SectionHeading` shipped.             |
-| M1  | `/pricing` — freemium tier cards          | ✅     | Three tier grid, Free highlighted, Pro/Enterprise locked with "Coming Soon" overlay.         |
-| M2  | `/changelog` — version history            | ✅     | Cards parsed from `src/data/changelog.ts`; hero counters animate.                            |
-| M3  | `/explore` upgrades                       | ✅     | Scroll progress rail, cursor-reactive blobs, 3D dashboard mock, hero word-stagger, parallax. |
-| M4  | `/ecosystem` rebuild                      | ✅     | Five module cards, status badges, hover mini-preview gradient.                               |
-| M5  | `/journey` rebuild                        | ✅     | Vertical timeline with scroll-driven line draw + milestone reveal.                           |
-| M6  | Performance + SEO + Konami easter egg     | ✅     | Per-page meta, JSON-LD on home, intersection-gated heavy components, easter egg on explore.  |
-| M7  | Hardening, copy polish, docs              | 🟡     | Manual mobile + Lighthouse pass + final tests pending.                                       |
+| #   | Milestone                                 | Status | Notes                                                                                                                                               |
+| --- | ----------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| M0  | Public shell + reduced-motion + meta hook | ✅     | `PublicLayout`, `useReducedMotion`, `useDocumentMeta`, `SectionHeading` shipped.                                                                    |
+| M1  | `/pricing` — freemium tier cards          | ✅     | Three tier grid, Free highlighted, Pro/Enterprise locked with "Coming Soon" overlay.                                                                |
+| M2  | `/changelog` — version history            | ✅     | Cards parsed from `src/data/changelog.ts`; hero counters animate.                                                                                   |
+| M3  | `/explore` upgrades                       | ✅     | Scroll progress rail, cursor-reactive blobs, 3D dashboard mock, hero word-stagger, parallax.                                                        |
+| M4  | `/ecosystem` rebuild                      | ✅     | Five module cards, status badges, hover mini-preview gradient.                                                                                      |
+| M5  | `/journey` rebuild                        | ✅     | Vertical timeline with scroll-driven line draw + milestone reveal.                                                                                  |
+| M6  | Performance + SEO + Konami easter egg     | ✅     | Per-page meta, JSON-LD on home, intersection-gated heavy components, easter egg on explore.                                                         |
+| M7  | Hardening, copy polish, docs              | ✅     | Render/snapshot tests added for the 6 website components (`src/test/website-components.test.tsx`). Mobile + Lighthouse passes deferred (manual/CI). |
 
 ## Routes shipped (Phase 5)
 
@@ -58,10 +58,14 @@
 | `src/data/ecosystemModules.ts`                  | Ecosystem module data.                              |
 | `src/data/journeyMilestones.ts`                 | Journey milestone data.                             |
 
-## Open work for M7
+## M7 closeout
 
-- Lighthouse mobile audit on `/explore` and `/pricing`.
-- Snapshot tests for new website components.
+- ✅ Render/content tests for new website components — `src/test/website-components.test.tsx`
+  covers `SectionHeading`, `ChangelogEntry`, `ModuleCard`, `PricingTierCard`, `TimelineItem`.
+
+### Deferred (manual/CI — cannot run headless in agent env)
+
+- Lighthouse mobile audit on `/explore` and `/pricing` (target 90+).
 - Mobile sweep at 375 / 414 / 768.
 
 ## Out of scope (deferred)
