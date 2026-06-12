@@ -17,7 +17,10 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 199 89% 48%;
+    /* Phase 4 M4: single accent-hue knob; default 199 = current sky-blue (zero visual change). */
+    --accent-hue: 199;
+
+    --primary: var(--accent-hue) 89% 48%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 220 14% 96%;
@@ -34,19 +37,19 @@
 
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 199 89% 48%;
+    --ring: var(--accent-hue) 89% 48%;
 
     --radius: 0.5rem;
 
     /* Sidebar */
     --sidebar-background: 220 15% 94%;
     --sidebar-foreground: 220 9% 46%;
-    --sidebar-primary: 199 89% 48%;
+    --sidebar-primary: var(--accent-hue) 89% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 199 89% 48%;
+    --sidebar-accent: var(--accent-hue) 89% 48%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 220 13% 88%;
-    --sidebar-ring: 199 89% 48%;
+    --sidebar-ring: var(--accent-hue) 89% 48%;
 
     /* Header (tách riêng, không phụ thuộc main/sidebar) */
     --header-background: 220 14% 97%;
@@ -58,13 +61,13 @@
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 222 47% 11%;
-    --info: 199 89% 48%;
+    --info: var(--accent-hue) 89% 48%;
     --info-foreground: 0 0% 100%;
 
     /* Card variations */
     --card-hover: 220 14% 94%;
     --card-border: 220 13% 88%;
-    --card-border-accent: 199 89% 48%;
+    --card-border-accent: var(--accent-hue) 89% 48%;
 
     /* Neumorphic surfaces (Phase 4 — Interface 3.0), derived from --background */
     --neu-surface: 220 14% 96%;
@@ -85,7 +88,7 @@
     --popover: 0 0% 8%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 199 89% 48%;
+    --primary: var(--accent-hue) 89% 48%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 10%;
@@ -102,17 +105,17 @@
 
     --border: 0 0% 21%;
     --input: 0 0% 10%;
-    --ring: 199 89% 48%;
+    --ring: var(--accent-hue) 89% 48%;
 
     /* Sidebar - #1a1a1a */
     --sidebar-background: 0 0% 10%;
     --sidebar-foreground: 0 0% 55%;
-    --sidebar-primary: 199 89% 48%;
+    --sidebar-primary: var(--accent-hue) 89% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 199 89% 48%;
+    --sidebar-accent: var(--accent-hue) 89% 48%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 0 0% 21%;
-    --sidebar-ring: 199 89% 48%;
+    --sidebar-ring: var(--accent-hue) 89% 48%;
 
     /* Header - #1a1a1a (tách riêng, không phụ thuộc main) */
     --header-background: 0 0% 10%;
@@ -124,13 +127,13 @@
     --success-foreground: 210 40% 98%;
     --warning: 38 92% 50%;
     --warning-foreground: 222 47% 11%;
-    --info: 199 89% 48%;
+    --info: var(--accent-hue) 89% 48%;
     --info-foreground: 222 47% 11%;
 
     /* Card variations */
     --card-hover: 0 0% 10%;
     --card-border: 0 0% 21%;
-    --card-border-accent: 199 89% 48%;
+    --card-border-accent: var(--accent-hue) 89% 48%;
 
     /* Neumorphic surfaces (Phase 4 — Interface 3.0), derived from --background */
     --neu-surface: 0 0% 8%;

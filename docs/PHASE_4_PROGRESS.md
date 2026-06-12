@@ -5,7 +5,7 @@
 > [`PHASE_4_IMPLEMENTATION_PLAN.md`](./PHASE_4_IMPLEMENTATION_PLAN.md).
 > Updated as each milestone lands.
 
-**Last updated:** 2026-06-12 (M5 + M6 shipped)
+**Last updated:** 2026-06-12 (M4 + M5 + M6 shipped — Phase 4 complete)
 
 ## Status legend
 
@@ -21,7 +21,7 @@
 | M1  | Neumorphic Design System (tokens + opt-in variants) | ✅     | `--neu-*` tokens, `.neu-card` utility, `<Card variant="neu">`, `<Button variant="neu">`.                                                                      |
 | M2  | Micro-Interaction Library                           | ✅     | Motion tokens (`src/lib/motion.ts`), `useMicroInteractions` gate, `Pressable` + `Stagger` primitives. Per-element adoption rolls out opportunistically.       |
 | M3  | Cinematic Transition System                         | ✅     | `RouteProgressBar`, `PageTransition`; wired into `App.tsx` + `AppLayout`.                                                                                     |
-| M4  | OneApp Theme Engine + accent-hue system             | ⬜     | `/settings/appearance/themes`, 6 presets + custom hue. Future session.                                                                                        |
+| M4  | OneApp Theme Engine + accent-hue system             | ✅     | `src/lib/themes.ts` (6 presets), `--accent-hue` CSS refactor, `useThemeEngine`, `AppearanceThemes.tsx` page, route `/settings/appearance/themes`.             |
 | M5  | Canvas Dashboard 3.0 widgets                        | ✅     | 7 widgets (Deploy/AIBriefing/NoteGraph/TaskBurndown/DBHealth/AdminPulse/CryptoPulse) gated by `FF_CANVAS_WIDGETS`; spring drag-in via `useMicroInteractions`. |
 | M6  | Sidebar 3.0 + hardening, tests, docs                | ✅     | Pinnable quick-actions (`sidebar_pinned_actions`), mini activity feed, system pulse strip; gated by `FF_SIDEBAR_3`. Tests + docs included.                    |
 
@@ -50,8 +50,8 @@ To roll out in production, set each `VITE_FF_*` to `1` (or `true`) and rebuild.
 ## Verification status
 
 - `npm run lint` — passes (0 errors)
-- `npm run test` — passes (62 total; +15 dashboard-metrics, +10 sidebar-actions, +2 flag-set update over the M0–M3 baseline)
-- `npm run build` — passes (Canvas 3.0 widgets + Sidebar 3.0 compile cleanly)
+- `npm run test` — passes (79 total; M0–M3 baseline 37 + M4 theme-engine 17 + M5 dashboard-metrics 15 + M6 sidebar-actions 10)
+- `npm run build` — passes (all Phase 4 modules compile cleanly)
 
 ## M2 — Micro-Interaction Library (files)
 
@@ -75,6 +75,19 @@ momentum overshoot, spring toasts) adopt the same tokens as components migrate.
 | `src/components/layout/AppLayout.tsx`        | Replaced inline `AnimatePresence` block with `<PageTransition>`.        |
 | `src/App.tsx`                                | `<RouteProgressBar />` mounted alongside `<Sonner />` in shell.         |
 | `src/test/cinematic.test.tsx`                | 4 render tests covering both primitives.                                |
+
+## M4 — Theme Engine UI (files)
+
+| Path                             | Purpose                                                                                                                     |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `src/lib/themes.ts`              | 6 presets (Midnight/Carbon/Slate/Arctic/Sand/Obsidian), `applyThemePreset`, `applyAccentHue`, localStorage FOUC guard.      |
+| `src/index.css`                  | `--accent-hue: 199` added to `:root`; `--primary`, `--ring`, sidebar + card accent vars derived via `var(--accent-hue)`.    |
+| `src/hooks/useCustomTheme.tsx`   | `useThemeEngine` hook: reads DB via `useDataQuery`, writes via `useDataUpsert`; FOUC prevention via localStorage sync init. |
+| `src/pages/AppearanceThemes.tsx` | Preset grid (6 × `<Card variant="neu">`) + native range hue slider; Stagger entrance; Save + error toast.                   |
+| `src/App.tsx`                    | Lazy import + route `/settings/appearance/themes`; redirects to `/settings/appearance` when `FF_THEME_ENGINE` OFF.          |
+| `src/test/theme-engine.test.ts`  | 17 tests: 6-preset contract, default-hue math, DOM side-effects, localStorage round-trip.                                   |
+
+Non-breaking design: `--accent-hue: 199` default produces identical output to the previous literal `199 89% 48%` — zero visual change when flag is OFF.
 
 ## M5 — Canvas Dashboard 3.0 (files)
 
@@ -107,6 +120,7 @@ momentum overshoot, spring toasts) adopt the same tokens as components migrate.
 ## Deferred (manual/CI — cannot run headless in agent env)
 
 - Visual check of the `neu` variant, micro-interactions, and cinematic transitions in-app (light + dark, reduced-motion).
+- Visual check of all 6 theme presets + hue slider in AppearanceThemes.
 - Visual check of the 7 Canvas 3.0 widgets and the Sidebar 3.0 sections (light + dark, collapsed + expanded, reduced-motion).
 
 ## Supabase
