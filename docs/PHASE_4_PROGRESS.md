@@ -5,7 +5,7 @@
 > [`PHASE_4_IMPLEMENTATION_PLAN.md`](./PHASE_4_IMPLEMENTATION_PLAN.md).
 > Updated as each milestone lands.
 
-**Last updated:** 2026-06-11 (M3 shipped)
+**Last updated:** 2026-06-12 (M5 + M6 shipped)
 
 ## Status legend
 
@@ -15,15 +15,15 @@
 
 ## Milestones
 
-| #   | Milestone                                           | Status | Notes                                                                                                                                                   |
-| --- | --------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| M0  | Scaffold — flags + theme-engine migration + docs    | ✅     | `PHASE_4_FLAGS`, migration `20260611120000_*` (file only), this tracker + plan doc.                                                                     |
-| M1  | Neumorphic Design System (tokens + opt-in variants) | ✅     | `--neu-*` tokens, `.neu-card` utility, `<Card variant="neu">`, `<Button variant="neu">`.                                                                |
-| M2  | Micro-Interaction Library                           | ✅     | Motion tokens (`src/lib/motion.ts`), `useMicroInteractions` gate, `Pressable` + `Stagger` primitives. Per-element adoption rolls out opportunistically. |
-| M3  | Cinematic Transition System                         | ✅     | `RouteProgressBar`, `PageTransition`; wired into `App.tsx` + `AppLayout`.                                                                               |
-| M4  | OneApp Theme Engine + accent-hue system             | ⬜     | `/settings/appearance/themes`, 6 presets + custom hue. Future session.                                                                                  |
-| M5  | Canvas Dashboard 3.0 widgets                        | ⬜     | New widget registry entries with spring drag-in. Future session.                                                                                        |
-| M6  | Sidebar 3.0 + hardening, tests, docs                | ⬜     | Activity feed, pinned actions, pulse strip. Future session.                                                                                             |
+| #   | Milestone                                           | Status | Notes                                                                                                                                                         |
+| --- | --------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| M0  | Scaffold — flags + theme-engine migration + docs    | ✅     | `PHASE_4_FLAGS`, migration `20260611120000_*` (file only), this tracker + plan doc.                                                                           |
+| M1  | Neumorphic Design System (tokens + opt-in variants) | ✅     | `--neu-*` tokens, `.neu-card` utility, `<Card variant="neu">`, `<Button variant="neu">`.                                                                      |
+| M2  | Micro-Interaction Library                           | ✅     | Motion tokens (`src/lib/motion.ts`), `useMicroInteractions` gate, `Pressable` + `Stagger` primitives. Per-element adoption rolls out opportunistically.       |
+| M3  | Cinematic Transition System                         | ✅     | `RouteProgressBar`, `PageTransition`; wired into `App.tsx` + `AppLayout`.                                                                                     |
+| M4  | OneApp Theme Engine + accent-hue system             | ⬜     | `/settings/appearance/themes`, 6 presets + custom hue. Future session.                                                                                        |
+| M5  | Canvas Dashboard 3.0 widgets                        | ✅     | 7 widgets (Deploy/AIBriefing/NoteGraph/TaskBurndown/DBHealth/AdminPulse/CryptoPulse) gated by `FF_CANVAS_WIDGETS`; spring drag-in via `useMicroInteractions`. |
+| M6  | Sidebar 3.0 + hardening, tests, docs                | ✅     | Pinnable quick-actions (`sidebar_pinned_actions`), mini activity feed, system pulse strip; gated by `FF_SIDEBAR_3`. Tests + docs included.                    |
 
 ## Schema changes staged (Phase 4)
 
@@ -42,14 +42,16 @@ All 25 migrations (including full base schema) applied to the new project `gvcel
 | `FF_NEU_DESIGN`         | ON            | OFF            | `VITE_FF_NEU_DESIGN`         |
 | `FF_THEME_ENGINE`       | ON            | OFF            | `VITE_FF_THEME_ENGINE`       |
 | `FF_MICRO_INTERACTIONS` | ON            | OFF            | `VITE_FF_MICRO_INTERACTIONS` |
+| `FF_CANVAS_WIDGETS`     | ON            | OFF            | `VITE_FF_CANVAS_WIDGETS`     |
+| `FF_SIDEBAR_3`          | ON            | OFF            | `VITE_FF_SIDEBAR_3`          |
 
 To roll out in production, set each `VITE_FF_*` to `1` (or `true`) and rebuild.
 
 ## Verification status
 
 - `npm run lint` — passes (0 errors)
-- `npm run test` — passes (37 total; +4 for cinematic transitions in `src/test/cinematic.test.tsx`)
-- `npm run build` — passes (CSS tokens + opt-in variants + motion primitives compile cleanly)
+- `npm run test` — passes (62 total; +15 dashboard-metrics, +10 sidebar-actions, +2 flag-set update over the M0–M3 baseline)
+- `npm run build` — passes (Canvas 3.0 widgets + Sidebar 3.0 compile cleanly)
 
 ## M2 — Micro-Interaction Library (files)
 
@@ -74,9 +76,38 @@ momentum overshoot, spring toasts) adopt the same tokens as components migrate.
 | `src/App.tsx`                                | `<RouteProgressBar />` mounted alongside `<Sonner />` in shell.         |
 | `src/test/cinematic.test.tsx`                | 4 render tests covering both primitives.                                |
 
+## M5 — Canvas Dashboard 3.0 (files)
+
+| Path                                                  | Purpose                                                                                                         |
+| ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `src/lib/dashboard-metrics.ts`                        | Pure helpers: relative time, portfolio, burndown, activity merge, note graph.                                   |
+| `src/components/dashboard/widgets/*.tsx` (×7)         | DeployStatus, AIBriefing, NoteGraph, TaskBurndown, DBHealth, AdminPulse, CryptoPulse — data via `useDataQuery`. |
+| `src/components/dashboard/widgets/WidgetEmpty.tsx`    | Shared empty-state for the new widgets.                                                                         |
+| `src/hooks/useLatestSystemConnection.ts`              | Shared single-fetch read of the latest `system_connection` row.                                                 |
+| `src/components/dashboard/widgets/WidgetRegistry.tsx` | Registers the 7 new types + `CANVAS_3_WIDGET_TYPES`.                                                            |
+| `src/components/dashboard/AddWidgetDialog.tsx`        | Hides Canvas 3.0 widgets from the picker unless `FF_CANVAS_WIDGETS`.                                            |
+| `src/components/dashboard/DashboardGrid.tsx`          | Spring drag-in (`dashboard-spring` + `animate-widget-drop`) gated on micro-interactions.                        |
+| `src/index.css`                                       | `widget-drop-in` keyframe + springy magnetic-snap timing.                                                       |
+| `src/test/dashboard-metrics.test.ts`                  | 15 tests for the metric helpers.                                                                                |
+
+## M6 — Sidebar 3.0 (files)
+
+| Path                                             | Purpose                                                                 |
+| ------------------------------------------------ | ----------------------------------------------------------------------- |
+| `src/lib/sidebar-actions.ts`                     | Quick-action catalog + pure pin/unpin helpers.                          |
+| `src/hooks/useSidebarPinnedActions.ts`           | Reads/writes `user_settings.sidebar_pinned_actions` via the data-layer. |
+| `src/hooks/useSidebarActivity.ts`                | Merges recent notes/tasks/trades into the activity feed.                |
+| `src/hooks/useSystemPulse.ts`                    | DB / deploy / AI status signals for the pulse strip.                    |
+| `src/components/layout/SidebarPinnedActions.tsx` | Pinned quick-actions + manage popover (max 3).                          |
+| `src/components/layout/SidebarActivityFeed.tsx`  | Collapsible last-5 activity feed.                                       |
+| `src/components/layout/SidebarPulseStrip.tsx`    | Three status dots at the sidebar foot.                                  |
+| `src/components/layout/AppSidebar.tsx`           | Renders the three sections gated on `FF_SIDEBAR_3`.                     |
+| `src/test/sidebar-actions.test.ts`               | 10 tests for the catalog + pin helpers.                                 |
+
 ## Deferred (manual/CI — cannot run headless in agent env)
 
 - Visual check of the `neu` variant, micro-interactions, and cinematic transitions in-app (light + dark, reduced-motion).
+- Visual check of the 7 Canvas 3.0 widgets and the Sidebar 3.0 sections (light + dark, collapsed + expanded, reduced-motion).
 
 ## Supabase
 

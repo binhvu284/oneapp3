@@ -39,8 +39,8 @@ neumorphic dark surfaces, cinematic transitions, and tactile micro-interactions 
 | M2  | Micro-Interaction Library                           | 6.3 F4.2 | M1         | 5 d  | ✅     |
 | M3  | Cinematic Transition System                         | 6.3 F4.3 | M1         | 5 d  | ✅     |
 | M4  | OneApp Theme Engine + accent-hue system             | 6.3 F4.5 | M0, M1     | 5 d  | ⬜     |
-| M5  | Canvas Dashboard 3.0 widgets                        | 6.3 F4.4 | M1         | 6 d  | ⬜     |
-| M6  | Sidebar 3.0 + hardening, tests, docs                | 6.3 F4.6 | all        | 5 d  | ⬜     |
+| M5  | Canvas Dashboard 3.0 widgets                        | 6.3 F4.4 | M1         | 6 d  | ✅     |
+| M6  | Sidebar 3.0 + hardening, tests, docs                | 6.3 F4.6 | all        | 5 d  | ✅     |
 
 Order rationale: tokens + base variants first (everything else composes on them);
 micro-interactions and transitions are independent and parallelizable; the theme

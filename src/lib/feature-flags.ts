@@ -49,9 +49,13 @@ export const PHASE_1_FLAGS = {
 export const FF_NEU_DESIGN = flag(import.meta.env.VITE_FF_NEU_DESIGN);
 export const FF_THEME_ENGINE = flag(import.meta.env.VITE_FF_THEME_ENGINE);
 export const FF_MICRO_INTERACTIONS = flag(import.meta.env.VITE_FF_MICRO_INTERACTIONS);
+export const FF_CANVAS_WIDGETS = flag(import.meta.env.VITE_FF_CANVAS_WIDGETS);
+export const FF_SIDEBAR_3 = flag(import.meta.env.VITE_FF_SIDEBAR_3);
 
 export const PHASE_4_FLAGS = {
   FF_NEU_DESIGN,
   FF_THEME_ENGINE,
   FF_MICRO_INTERACTIONS,
+  FF_CANVAS_WIDGETS,
+  FF_SIDEBAR_3,
 } as const;

@@ -7,6 +7,10 @@ import oneappLogo from "@/assets/oneapp-logo.png";
 import { useSidebarSettings, basicNavItems } from "@/hooks/useSidebarSettings";
 import { useAppStore } from "@/hooks/useAppStore";
 import { AppIcon } from "@/components/icons/AppIcon";
+import { FF_SIDEBAR_3 } from "@/lib/feature-flags";
+import { SidebarPinnedActions } from "@/components/layout/SidebarPinnedActions";
+import { SidebarActivityFeed } from "@/components/layout/SidebarActivityFeed";
+import { SidebarPulseStrip } from "@/components/layout/SidebarPulseStrip";
 const customizationSection = {
   label: "CUSTOMIZATION",
   items: [{
@@ -92,6 +96,9 @@ export function AppSidebar({
         </div>
       </div>}
 
+      {/* Phase 4 M6 — Sidebar 3.0: pinned quick-actions */}
+      {FF_SIDEBAR_3 && <SidebarPinnedActions collapsed={collapsed} />}
+
       {/* Custom Sections from Settings */}
       {settings.customSections.map(section => <div key={section.id} className="mb-2">
         {/* Section separator dot for collapsed state */}
@@ -113,6 +120,9 @@ export function AppSidebar({
           })}
         </div>}
       </div>)}
+
+      {/* Phase 4 M6 — Sidebar 3.0: mini activity feed */}
+      {FF_SIDEBAR_3 && <SidebarActivityFeed collapsed={collapsed} />}
     </nav>
 
     {/* Customization Section - Fixed at bottom */}
@@ -134,5 +144,10 @@ export function AppSidebar({
         </NavLink>)}
       </div>}
     </div>
+
+    {/* Phase 4 M6 — Sidebar 3.0: system pulse strip (very bottom) */}
+    {FF_SIDEBAR_3 && <div className="border-t border-sidebar-border">
+      <SidebarPulseStrip collapsed={collapsed} />
+    </div>}
   </aside>;
 }

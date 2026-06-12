@@ -2,6 +2,7 @@ import { lazy, ComponentType } from "react";
 import {
   Clock, BarChart3, Grid3X3, Activity, TrendingUp,
   Calendar, Hand, Zap, StickyNote, CloudSun, Timer, CheckSquare, Sunrise,
+  Rocket, Sparkles, Network, ListChecks, Database, ShieldCheck, Coins,
 } from "lucide-react";
 
 const ClockWidget = lazy(() => import("./ClockWidget"));
@@ -17,6 +18,14 @@ const WeatherWidget = lazy(() => import("./WeatherWidget"));
 const PomodoroWidget = lazy(() => import("./PomodoroWidget"));
 const TodoWidget = lazy(() => import("./TodoWidget"));
 const DailyBriefingWidget = lazy(() => import("./DailyBriefingWidget"));
+// Phase 4 M5 — Canvas Dashboard 3.0 widgets
+const DeployStatusWidget = lazy(() => import("./DeployStatusWidget"));
+const AIBriefingWidget = lazy(() => import("./AIBriefingWidget"));
+const NoteGraphWidget = lazy(() => import("./NoteGraphWidget"));
+const TaskBurndownWidget = lazy(() => import("./TaskBurndownWidget"));
+const DBHealthWidget = lazy(() => import("./DBHealthWidget"));
+const AdminPulseWidget = lazy(() => import("./AdminPulseWidget"));
+const CryptoPulseWidget = lazy(() => import("./CryptoPulseWidget"));
 
 export type WidgetType =
   | "clock"
@@ -31,7 +40,25 @@ export type WidgetType =
   | "weather"
   | "pomodoro"
   | "todo"
-  | "daily_briefing";
+  | "daily_briefing"
+  | "deploy_status"
+  | "ai_briefing"
+  | "note_graph"
+  | "task_burndown"
+  | "db_health"
+  | "admin_pulse"
+  | "crypto_pulse";
+
+/** Widget types introduced in Phase 4 M5; gated behind FF_CANVAS_WIDGETS. */
+export const CANVAS_3_WIDGET_TYPES: readonly WidgetType[] = [
+  "deploy_status",
+  "ai_briefing",
+  "note_graph",
+  "task_burndown",
+  "db_health",
+  "admin_pulse",
+  "crypto_pulse",
+];
 
 export interface WidgetDefinition {
   type: WidgetType;
@@ -170,6 +197,63 @@ export const WIDGET_REGISTRY: Record<WidgetType, WidgetDefinition> = {
     icon: Sunrise,
     component: DailyBriefingWidget,
     defaultSize: { w: 4, h: 4, minW: 3, minH: 3 },
+  },
+  // ── Phase 4 M5 — Canvas Dashboard 3.0 ──────────────────────────────────────
+  deploy_status: {
+    type: "deploy_status",
+    label: "Deploy Status",
+    description: "Latest deploy/sync health",
+    icon: Rocket,
+    component: DeployStatusWidget,
+    defaultSize: { w: 3, h: 2, minW: 2, minH: 2 },
+  },
+  ai_briefing: {
+    type: "ai_briefing",
+    label: "AI Briefing",
+    description: "Today's AI briefing, refreshable",
+    icon: Sparkles,
+    component: AIBriefingWidget,
+    defaultSize: { w: 4, h: 2, minW: 3, minH: 2 },
+  },
+  note_graph: {
+    type: "note_graph",
+    label: "Note Graph",
+    description: "Mini note connection graph",
+    icon: Network,
+    component: NoteGraphWidget,
+    defaultSize: { w: 3, h: 3, minW: 2, minH: 2 },
+  },
+  task_burndown: {
+    type: "task_burndown",
+    label: "Task Burndown",
+    description: "Tasks done vs. remaining this week",
+    icon: ListChecks,
+    component: TaskBurndownWidget,
+    defaultSize: { w: 3, h: 2, minW: 3, minH: 2 },
+  },
+  db_health: {
+    type: "db_health",
+    label: "DB Health",
+    description: "Provider, status & last check",
+    icon: Database,
+    component: DBHealthWidget,
+    defaultSize: { w: 3, h: 2, minW: 2, minH: 2 },
+  },
+  admin_pulse: {
+    type: "admin_pulse",
+    label: "Admin Pulse",
+    description: "New signups & active users",
+    icon: ShieldCheck,
+    component: AdminPulseWidget,
+    defaultSize: { w: 3, h: 2, minW: 2, minH: 2 },
+  },
+  crypto_pulse: {
+    type: "crypto_pulse",
+    label: "Crypto Pulse",
+    description: "Portfolio value, 24h change, top mover",
+    icon: Coins,
+    component: CryptoPulseWidget,
+    defaultSize: { w: 3, h: 2, minW: 2, minH: 2 },
   },
 };
 

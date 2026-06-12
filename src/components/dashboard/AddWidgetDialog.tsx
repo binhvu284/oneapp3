@@ -1,7 +1,10 @@
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
-import { WIDGET_REGISTRY, WidgetType, DashboardWidget } from "./widgets/WidgetRegistry";
+import {
+  WIDGET_REGISTRY, WidgetType, DashboardWidget, CANVAS_3_WIDGET_TYPES,
+} from "./widgets/WidgetRegistry";
+import { FF_CANVAS_WIDGETS } from "@/lib/feature-flags";
 
 interface AddWidgetDialogProps {
   open: boolean;
@@ -11,6 +14,12 @@ interface AddWidgetDialogProps {
 }
 
 export function AddWidgetDialog({ open, onOpenChange, onAdd }: AddWidgetDialogProps) {
+  // Canvas 3.0 widgets only appear in the picker when their flag is on; existing
+  // widgets are always available so the dialog is non-breaking when the flag is off.
+  const available = Object.values(WIDGET_REGISTRY).filter(
+    (def) => FF_CANVAS_WIDGETS || !CANVAS_3_WIDGET_TYPES.includes(def.type),
+  );
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
@@ -19,7 +28,7 @@ export function AddWidgetDialog({ open, onOpenChange, onAdd }: AddWidgetDialogPr
           <DialogDescription className="text-xs">Choose a widget to add to your dashboard</DialogDescription>
         </DialogHeader>
         <div className="grid grid-cols-2 gap-2 mt-2 max-h-[60vh] overflow-auto">
-          {Object.values(WIDGET_REGISTRY).map((def) => {
+          {available.map((def) => {
             const Icon = def.icon;
             return (
               <button
