@@ -63,6 +63,7 @@ const Settings = lazy(() => import("@/pages/Settings"));
 const AccountSettings = lazy(() => import("@/pages/AccountSettings"));
 const ProfileSettings = lazy(() => import("@/pages/ProfileSettings"));
 const AppearanceSettings = lazy(() => import("@/pages/AppearanceSettings"));
+const AppearanceThemes = lazy(() => import("@/pages/AppearanceThemes"));
 const SecuritySettings = lazy(() => import("@/pages/SecuritySettings"));
 const NotificationSettings = lazy(() => import("@/pages/NotificationSettings"));
 const OneCrypto = lazy(() => import("@/pages/OneCrypto"));
@@ -145,6 +146,7 @@ const App = () => (
                             <Route path="/settings/account" element={<AccountSettings />} />
                             <Route path="/settings/profile" element={<ProfileSettings />} />
                             <Route path="/settings/appearance" element={<AppearanceSettings />} />
+                            <Route path="/settings/appearance/themes" element={<AppearanceThemes />} />
                             <Route path="/settings/security" element={<SecuritySettings />} />
                             <Route path="/settings/notifications" element={<NotificationSettings />} />
                             <Route path="/apps/crypto" element={<OneCrypto />} />
