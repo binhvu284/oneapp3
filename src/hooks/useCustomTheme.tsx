@@ -1,6 +1,18 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthSource as useAuthSafe } from "@/hooks/useAuthSource";
+import { useDataQuery, useDataUpsert } from "@/lib/data-layer";
+import { FF_THEME_ENGINE } from "@/lib/feature-flags";
+import {
+  type ThemePresetName,
+  type ThemeState,
+  DEFAULT_ACCENT_HUE,
+  PRESET_NAMES,
+  applyThemePreset,
+  applyAccentHue,
+  getStoredThemeState,
+  storeThemeState,
+} from "@/lib/themes";
 
 export interface CustomThemeColors {
   main: string;
@@ -255,5 +267,110 @@ export function useCustomTheme() {
     resetColors,
     isDark,
     defaultColors: isDark ? DEFAULT_DARK_COLORS : DEFAULT_LIGHT_COLORS,
+  };
+}
+
+// ─── Phase 4 M4 — Theme Engine hook ──────────────────────────────────────────
+
+interface UserSettingsRow {
+  theme_preset: string | null;
+  accent_hue: number | null;
+}
+
+const DEFAULT_STATE: ThemeState = { preset: "Midnight", accentHue: DEFAULT_ACCENT_HUE };
+
+/**
+ * Reads and writes `user_settings.theme_preset` + `accent_hue` via the
+ * data-layer (no raw supabase calls). Only active when FF_THEME_ENGINE is ON.
+ *
+ * FOUC prevention: localStorage state is applied synchronously on first render
+ * before the DB query resolves.
+ */
+export function useThemeEngine() {
+  const { user } = useAuthSafe();
+
+  // Synchronous init from localStorage — avoids FOUC on page load.
+  // Side-effects (CSS var injection) are in useLayoutEffect-equivalent timing
+  // because they run in the lazy initializer which executes before paint.
+  const [state, setState] = useState<ThemeState>(() => {
+    if (!FF_THEME_ENGINE) return DEFAULT_STATE;
+    const stored = getStoredThemeState(); // validates preset name internally
+    if (stored) {
+      // Intentional synchronous DOM write to prevent FOUC: applies stored
+      // theme before first paint. Safe in browser (no SSR in this app).
+      applyThemePreset(stored.preset);
+      applyAccentHue(stored.accentHue);
+    }
+    return stored ?? DEFAULT_STATE;
+  });
+
+  // DB query — only when flag is ON and user is authenticated.
+  const { data: queryResult } = useDataQuery<UserSettingsRow>("user_settings", {
+    queryOptions: {
+      select: ["theme_preset", "accent_hue"],
+      filters: [{ column: "user_id", operator: "eq", value: user?.id ?? "" }],
+      single: true,
+    },
+    enabled: FF_THEME_ENGINE && !!user,
+  });
+
+  const upsert = useDataUpsert<UserSettingsRow & { user_id: string }>("user_settings");
+
+  // Reconcile DB state once it arrives — update localStorage + apply CSS vars.
+  // Use primitive deps to avoid re-running when React Query returns a new object reference.
+  const dbRow = (queryResult?.data as UserSettingsRow | null) ?? null;
+  const dbPreset = dbRow?.theme_preset ?? null;
+  const dbHue = dbRow?.accent_hue ?? null;
+
+  useEffect(() => {
+    if (!FF_THEME_ENGINE || dbPreset === null) return;
+    // Validate preset from DB — reject unknown values to prevent applyThemePreset throw.
+    const preset = (PRESET_NAMES as readonly string[]).includes(dbPreset)
+      ? (dbPreset as ThemePresetName)
+      : DEFAULT_STATE.preset;
+    const accentHue = dbHue ?? DEFAULT_STATE.accentHue;
+
+    setState({ preset, accentHue });
+    storeThemeState({ preset, accentHue });
+    // applyThemePreset already sets --accent-hue from the preset vars; no separate call needed.
+    applyThemePreset(preset);
+  }, [dbPreset, dbHue]);
+
+  /** Live preview — applies CSS vars immediately, does NOT persist. */
+  const setPreset = useCallback((preset: ThemePresetName) => {
+    if (!FF_THEME_ENGINE) return;
+    applyThemePreset(preset);
+    setState((prev) => ({ ...prev, preset }));
+  }, []);
+
+  /** Live preview — applies --accent-hue immediately, does NOT persist. */
+  const setAccentHue = useCallback((hue: number) => {
+    if (!FF_THEME_ENGINE) return;
+    applyAccentHue(hue);
+    setState((prev) => ({ ...prev, accentHue: hue }));
+  }, []);
+
+  /** Persists current preview state to DB + localStorage. Throws on network error. */
+  const save = useCallback(async () => {
+    if (!FF_THEME_ENGINE || !user) return;
+    await upsert.mutateAsync({
+      data: {
+        user_id: user.id,
+        theme_preset: state.preset,
+        accent_hue: state.accentHue,
+      },
+      conflictColumns: ["user_id"],
+    });
+    // Write to localStorage only after the DB confirms the round-trip.
+    storeThemeState(state);
+  }, [user, state, upsert]);
+
+  return {
+    preset: state.preset,
+    accentHue: state.accentHue,
+    setPreset,
+    setAccentHue,
+    save,
+    isSaving: upsert.isPending,
   };
 }
