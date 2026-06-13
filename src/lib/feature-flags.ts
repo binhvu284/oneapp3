@@ -59,3 +59,10 @@ export const PHASE_4_FLAGS = {
   FF_CANVAS_WIDGETS,
   FF_SIDEBAR_3,
 } as const;
+
+// ── Phase 2 — OneCommand (in progress: prod default OFF) ──────────────────
+export const FF_ONECOMMAND = flag(import.meta.env.VITE_FF_ONECOMMAND);
+
+export const PHASE_2_FLAGS = {
+  FF_ONECOMMAND,
+} as const;

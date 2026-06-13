@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthSource as useAuthSafe } from "@/hooks/useAuthSource";
+import { FF_ONECOMMAND } from "@/lib/feature-flags";
 
 export interface NavItem {
   id: string;
@@ -49,6 +50,7 @@ const defaultSettings: SidebarSettings = {
         { id: "ws-dev", title: "OneApp Developer", url: "/workspace/developer", iconName: "Zap" },
         { id: "ws-ai", title: "OneApp AI", url: "/developing/ai", iconName: "Sparkles" },
         { id: "ws-crypto", title: "OneCrypto", url: "/apps/crypto", iconName: "Bitcoin" },
+        ...(FF_ONECOMMAND ? [{ id: "ws-onecommand", title: "OneCommand", url: "/apps/onecommand", iconName: "Terminal" }] : []),
       ],
     },
   ],
